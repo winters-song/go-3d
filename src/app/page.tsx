@@ -2,7 +2,7 @@
 import * as THREE from 'three'
 import { Canvas, useFrame } from '@react-three/fiber'
 import { useRef, useState } from 'react'
-import {OrbitControls} from "@react-three/drei"
+import {OrbitControls, Stats} from "@react-three/drei"
 
 function Box(props: any) {
   // This reference gives us direct access to the THREE.Mesh object
@@ -32,6 +32,7 @@ export default function Home() {
     <Canvas style={{width: '100vw', height: '100vh'}} camera={{
       position: [3,3,3]
     }}>
+      <Stats />
       <mesh>
         <OrbitControls />
         <boxGeometry />
