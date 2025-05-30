@@ -12,17 +12,43 @@ import PlayerAvatars from '@/components/models/PlayerAvatars'
 import Board from '@/components/models/Board'
 
 function Scene() {
+  // Move the resource loading to a separate component that can be properly suspended
+  return (
+    <>
+      <ContactShadows position-y={0} opacity={0.5} blur={0.5} scale={10} frames={1} />
+      <OrbitControls 
+        enablePan={false} 
+        maxPolarAngle={Math.PI / 2} 
+        minDistance={3} 
+        maxDistance={10}
+        target={[0, 1.16, 0]}
+        makeDefault
+      />
+      <Lights />
+      <Suspense fallback={null}>
+        <SceneContent />
+      </Suspense>
+      <Preload all />
+      <Stats className="stats" />
+    </>
+  )
+}
+
+function SceneContent() {
+  // Load all textures and models here, safely inside a suspended component
   const gridTexture = useTexture('/goboard_grid.png')
   const woodTexture = useTexture('/wood.jpg')
   const { scene: feetScene } = useGLTF('/feet.draco.glb')
   const { scene: containerScene } = useGLTF('/container.draco.glb')
   
+  // Configure textures after loading
   gridTexture.wrapS = gridTexture.wrapT = THREE.RepeatWrapping
   gridTexture.repeat.set(1, 1)
   
   woodTexture.wrapS = woodTexture.wrapT = THREE.RepeatWrapping
   woodTexture.repeat.set(1, 1)
   woodTexture.offset.set(0, 0)
+  
   const player = useRef<{
     stones: number[]
     printBoard: () => void
@@ -60,22 +86,11 @@ function Scene() {
 
   return (
     <>
-      <ContactShadows position-y={0} opacity={0.5} blur={0.5} scale={10} frames={1} />
-      <OrbitControls 
-        enablePan={false} 
-        maxPolarAngle={Math.PI / 2} 
-        minDistance={3} 
-        maxDistance={10}
-        target={[0, 1.16, 0]}
-      />
-      <Lights />
       <Board gridTexture={gridTexture} player={player.current} />
       <WoodenBase woodTexture={woodTexture} />
       {/* <PlayerAvatars /> */}
       <Feet scene={feetScene} />
       <Container scene={containerScene} woodTexture={woodTexture} />
-      <Preload all />
-      <Stats className="stats" />
     </>
   )
 }

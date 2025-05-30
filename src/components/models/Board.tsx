@@ -1,6 +1,6 @@
 import { useRef, useState, useEffect } from 'react'
 import * as THREE from 'three'
-import { ThreeEvent } from '@react-three/fiber'
+import { ThreeEvent, useThree } from '@react-three/fiber'
 import Stone from './Stone'
 import Head from './Head'
 
@@ -9,6 +9,7 @@ export default function Board({ gridTexture, player }: { gridTexture: THREE.Text
   const [hoverCell, setHoverCell] = useState<{ col: number, row: number } | null>(null)
   const [lastPlacedStone, setLastPlacedStone] = useState<{ col: number, row: number } | null>(null)
   const planeRef = useRef<THREE.Mesh>(null!)
+  const { gl, controls } = useThree()
   const boardSize = 19
   const gridScale = 2.8
   const boardScale = 3
@@ -30,6 +31,13 @@ export default function Board({ gridTexture, player }: { gridTexture: THREE.Text
       currentPlayer
     })
   }, [player.stones, currentPlayer])
+
+  // Set up the detection plane with high render order for event priority
+  useEffect(() => {
+    if (planeRef.current) {
+      planeRef.current.renderOrder = 999; // High value for render order
+    }
+  }, []);
 
   const getValidBoardPosition = (intersectionPoint: THREE.Vector3) => {
     // Convert to board coordinates (0-18)
@@ -90,6 +98,32 @@ export default function Board({ gridTexture, player }: { gridTexture: THREE.Text
     setHoverCell(null)
   }
 
+  // Prevent OrbitControls from capturing events when interacting with the board
+  const handlePointerDown = (event: ThreeEvent<PointerEvent>) => {
+    event.stopPropagation()
+    gl.domElement.style.cursor = 'pointer'
+    
+    // Temporarily disable orbit controls
+    if (controls) {
+      // @ts-ignore - disable orbit controls temporarily
+      controls.enabled = false
+    }
+    
+    // Handle the click
+    handleClick(event as unknown as ThreeEvent<MouseEvent>)
+  }
+
+  const handlePointerUp = (event: ThreeEvent<PointerEvent>) => {
+    event.stopPropagation()
+    gl.domElement.style.cursor = 'auto'
+    
+    // Re-enable orbit controls
+    if (controls) {
+      // @ts-ignore - re-enable orbit controls
+      controls.enabled = true
+    }
+  }
+
   return (
     <>
       {/* Grid texture plane */}
@@ -103,7 +137,8 @@ export default function Board({ gridTexture, player }: { gridTexture: THREE.Text
         ref={planeRef}
         rotation-x={-Math.PI * 0.5} 
         position-y={1.61}
-        onPointerDown={handleClick}
+        onPointerDown={handlePointerDown}
+        onPointerUp={handlePointerUp}
         onPointerMove={handlePointerMove}
         onPointerLeave={handlePointerLeave}
       >
