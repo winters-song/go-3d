@@ -1,29 +1,45 @@
 "use client"
 import * as THREE from 'three'
 import { Canvas, useFrame } from '@react-three/fiber'
-import { useRef, useState } from 'react'
-import {OrbitControls, Stats} from "@react-three/drei"
+import { useRef, useState, useEffect } from 'react'
+import {OrbitControls, Stats, useGLTF, useHelper} from "@react-three/drei"
 
-function Box(props: any) {
-  // This reference gives us direct access to the THREE.Mesh object
-  const ref = useRef<THREE.Mesh>(null!)
-  // Hold state for hovered and clicked events
-  const [hovered, hover] = useState(false)
-  const [clicked, click] = useState(false)
-  // Subscribe this component to the render-loop, rotate the mesh every frame
-  useFrame((state, delta) => (ref.current.rotation.x += delta))
-  // Return the view, these are regular Threejs elements expressed in JSX
+function Model() {
+  const { scene } = useGLTF('/glb/bake.glb')
+  
+  useEffect(() => {
+    scene.traverse((child) => {
+      if (child instanceof THREE.Mesh) {
+        console.log('Mesh found:', child.name)
+        console.log('Material:', child.material)
+
+        // child.material.color.set(0, 1, 0)
+      }
+    })
+  }, [scene])
+  
+  return <primitive object={scene} />
+}
+
+function Scene() {
+  const lightRef = useRef<THREE.DirectionalLight>(null!)
+  useHelper(lightRef, THREE.DirectionalLightHelper, 1, 'red')
+  
   return (
-    <mesh
-      {...props}
-      ref={ref}
-      scale={clicked ? 1.5 : 1}
-      onClick={(event: any) => click(!clicked)}
-      onPointerOver={(event) => hover(true)}
-      onPointerOut={(event) => hover(false)}>
-      <boxGeometry args={[1, 1, 1]} />
-      <meshStandardMaterial color={hovered ? 'hotpink' : 'orange'} />
-    </mesh>
+    <>
+      <OrbitControls />
+      {/* <directionalLight 
+        ref={lightRef}
+        position={[5, 5, 5]} 
+        intensity={20} 
+        color={'red'}
+        castShadow
+        shadow-mapSize-width={1024}
+        shadow-mapSize-height={1024}
+      />
+      <ambientLight intensity={0.5} /> */}
+      <Model />
+    </>
   )
 }
 
@@ -33,11 +49,7 @@ export default function Home() {
       position: [3,3,3]
     }}>
       <Stats />
-      <mesh>
-        <OrbitControls />
-        <boxGeometry />
-        <meshNormalMaterial />
-      </mesh>
+      <Scene />
     </Canvas>
   );
 }

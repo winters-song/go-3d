@@ -67,11 +67,14 @@ export default function PlayerAvatars() {
 
     initCamera();
 
+    // Store video element reference for cleanup
+    const videoElement = videoRef.current;
+
     return () => {
-      // Cleanup
-      if (videoRef.current?.srcObject) {
+      // Cleanup using stored reference
+      if (videoElement?.srcObject) {
         console.log("Cleaning up camera stream");
-        const stream = videoRef.current.srcObject as MediaStream;
+        const stream = videoElement.srcObject as MediaStream;
         stream.getTracks().forEach(track => track.stop());
       }
     };

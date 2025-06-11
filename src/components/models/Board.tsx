@@ -3,6 +3,7 @@ import * as THREE from 'three'
 import { ThreeEvent, useThree } from '@react-three/fiber'
 import Stone from './Stone'
 import Head from './Head'
+import { Bloom, EffectComposer } from '@react-three/postprocessing'
 
 export default function Board({ gridTexture, player }: { gridTexture: THREE.Texture, player: any }) {
   const [currentPlayer, setCurrentPlayer] = useState<'black' | 'white'>('black')
@@ -11,11 +12,11 @@ export default function Board({ gridTexture, player }: { gridTexture: THREE.Text
   const planeRef = useRef<THREE.Mesh>(null!)
   const { gl, controls } = useThree()
   const boardSize = 19
-  const gridScale = 2.8
+  const gridScale = 2.83
   const boardScale = 3
   const offset = gridScale / 2
   const unitLength = gridScale / (boardSize - 1)
-  
+
   // Convert board coordinates (col, row) to world position
   const boardToWorldPosition = (col: number, row: number): [number, number, number] => {
     return [
@@ -24,7 +25,8 @@ export default function Board({ gridTexture, player }: { gridTexture: THREE.Text
       row * unitLength - offset
     ]
   }
-  
+
+
   useEffect(() => {
     console.log('Board rendered because of:', {
       stonesCount: player.stones.filter((stone: number) => stone !== 0).length,
@@ -41,12 +43,12 @@ export default function Board({ gridTexture, player }: { gridTexture: THREE.Text
 
   const getValidBoardPosition = (intersectionPoint: THREE.Vector3) => {
     // Convert to board coordinates (0-18)
-    const x = Math.floor((intersectionPoint.x + offset + unitLength/2) / unitLength)
-    const y = boardSize - 1 - Math.floor((intersectionPoint.y + offset + unitLength/2) / unitLength)
-    
+    const x = Math.floor((intersectionPoint.x + offset + unitLength / 2) / unitLength)
+    const y = boardSize - 1 - Math.floor((intersectionPoint.y + offset + unitLength / 2) / unitLength)
+
     // Validate position is within board
     if (x < 0 || x >= boardSize || y < 0 || y >= boardSize) return null
-    
+
     // Check if position is already occupied
     const isOccupied = player.stones[y * boardSize + x] !== 0
     if (isOccupied) return null
@@ -72,7 +74,7 @@ export default function Board({ gridTexture, player }: { gridTexture: THREE.Text
   const handlePointerLeave = () => {
     setHoverCell(null)
   }
-  
+
   const handleClick = (event: ThreeEvent<MouseEvent>) => {
     event.stopPropagation()
     if (!planeRef.current) return
@@ -86,13 +88,13 @@ export default function Board({ gridTexture, player }: { gridTexture: THREE.Text
 
     const { boardX, boardY } = position
     const stoneIndex = boardY * boardSize + boardX
-    
+
     // Update the stones array in player object
     player.stones[stoneIndex] = currentPlayer === 'black' ? 1 : 2
-    
+
     // Store the last placed stone position
     setLastPlacedStone({ col: boardX, row: boardY })
-    
+
     // Switch player
     setCurrentPlayer(currentPlayer === 'black' ? 'white' : 'black')
     setHoverCell(null)
@@ -102,13 +104,13 @@ export default function Board({ gridTexture, player }: { gridTexture: THREE.Text
   const handlePointerDown = (event: ThreeEvent<PointerEvent>) => {
     event.stopPropagation()
     gl.domElement.style.cursor = 'pointer'
-    
+
     // Temporarily disable orbit controls
     if (controls) {
-      // @ts-ignore - disable orbit controls temporarily
+      // @ts-expect-error - disable orbit controls temporarily
       controls.enabled = false
     }
-    
+
     // Handle the click
     handleClick(event as unknown as ThreeEvent<MouseEvent>)
   }
@@ -116,26 +118,28 @@ export default function Board({ gridTexture, player }: { gridTexture: THREE.Text
   const handlePointerUp = (event: ThreeEvent<PointerEvent>) => {
     event.stopPropagation()
     gl.domElement.style.cursor = 'auto'
-    
+
     // Re-enable orbit controls
     if (controls) {
-      // @ts-ignore - re-enable orbit controls
+      // @ts-expect-error - re-enable orbit controls
       controls.enabled = true
     }
   }
 
   return (
     <>
+
       {/* Grid texture plane */}
-      <mesh rotation-x={-Math.PI * 0.5} position-y={1.604} >
+      {/* <mesh rotation-x={-Math.PI * 0.5} position-y={1.604} >
         <planeGeometry args={[gridScale, gridScale]} />
-        <meshBasicMaterial transparent opacity={1} map={gridTexture} />
-      </mesh>
+        <meshBasicMaterial transparent opacity={1} map={gridTexture} color={'white'} />
+        <meshLambertMaterial transparent opacity={1} map={gridTexture} emissive={'cyan'} emissiveIntensity={1.4} toneMapped={false} /> 
+      </mesh> */}
 
       {/* Invisible plane for click detection */}
-      <mesh 
+      <mesh
         ref={planeRef}
-        rotation-x={-Math.PI * 0.5} 
+        rotation-x={-Math.PI * 0.5}
         position-y={1.61}
         onPointerDown={handlePointerDown}
         onPointerUp={handlePointerUp}
@@ -167,23 +171,27 @@ export default function Board({ gridTexture, player }: { gridTexture: THREE.Text
         const col = index % boardSize;
         const position = boardToWorldPosition(col, row);
         const color = stoneValue === 1 ? 'black' : 'white';
-        
+
         return (
-          <Stone 
-            key={index} 
-            position={position} 
-            color={color} 
+          <Stone
+            key={index}
+            position={position}
+            color={color}
           />
         );
       })}
 
       {/* Render head marker on last stone */}
       {lastPlacedStone && (
-        <Head 
-          position={boardToWorldPosition(lastPlacedStone.col, lastPlacedStone.row)} 
-          stoneColor={player.stones[lastPlacedStone.row * boardSize + lastPlacedStone.col] === 1 ? 'black' : 'white'} 
+        <Head
+          position={boardToWorldPosition(lastPlacedStone.col, lastPlacedStone.row)}
+          stoneColor={player.stones[lastPlacedStone.row * boardSize + lastPlacedStone.col] === 1 ? 'black' : 'white'}
         />
       )}
+
+      <EffectComposer>
+        <Bloom intensity={0.1} luminanceThreshold={0.5} luminanceSmoothing={0.1} />
+      </EffectComposer>
     </>
   )
 }
