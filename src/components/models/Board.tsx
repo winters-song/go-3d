@@ -3,10 +3,8 @@ import * as THREE from 'three'
 import { ThreeEvent, useThree } from '@react-three/fiber'
 import Stone from './Stone'
 import Head from './Head'
-import { Bloom, EffectComposer } from '@react-three/postprocessing'
 
-export default function Board({ gridTexture, player }: { gridTexture: THREE.Texture, player: any }) {
-  const [currentPlayer, setCurrentPlayer] = useState<'black' | 'white'>('black')
+export default function Board({ player }: { player: any }) {
   const [hoverCell, setHoverCell] = useState<{ col: number, row: number } | null>(null)
   const [lastPlacedStone, setLastPlacedStone] = useState<{ col: number, row: number } | null>(null)
   const planeRef = useRef<THREE.Mesh>(null!)
@@ -27,20 +25,6 @@ export default function Board({ gridTexture, player }: { gridTexture: THREE.Text
   }
 
 
-  useEffect(() => {
-    console.log('Board rendered because of:', {
-      stonesCount: player.stones.filter((stone: number) => stone !== 0).length,
-      currentPlayer
-    })
-  }, [player.stones, currentPlayer])
-
-  // Set up the detection plane with high render order for event priority
-  useEffect(() => {
-    if (planeRef.current) {
-      planeRef.current.renderOrder = 999; // High value for render order
-    }
-  }, []);
-
   const getValidBoardPosition = (intersectionPoint: THREE.Vector3) => {
     // Convert to board coordinates (0-18)
     const x = Math.floor((intersectionPoint.x + offset + unitLength / 2) / unitLength)
@@ -50,7 +34,7 @@ export default function Board({ gridTexture, player }: { gridTexture: THREE.Text
     if (x < 0 || x >= boardSize || y < 0 || y >= boardSize) return null
 
     // Check if position is already occupied
-    const isOccupied = player.stones[y * boardSize + x] !== 0
+    const isOccupied = player.pieces[y * boardSize + x] !== 0
     if (isOccupied) return null
 
     return {
@@ -61,23 +45,40 @@ export default function Board({ gridTexture, player }: { gridTexture: THREE.Text
 
   const handlePointerMove = (event: ThreeEvent<PointerEvent>) => {
     event.stopPropagation()
-    if (!planeRef.current) return
+    if (!planeRef.current || !player) return
+
+    if(player.options.readonly || player.clientColor !== player.currentColor) {
+      setHoverCell(null)
+      gl.domElement.style.cursor = 'default'
+      return
+    }
 
     // Get intersection point in local coordinates
     const intersectionPoint = event.point.clone()
     planeRef.current.worldToLocal(intersectionPoint)
 
     const position = getValidBoardPosition(intersectionPoint)
-    setHoverCell(position ? { col: position.boardX, row: position.boardY } : null)
+    if (position) {
+      setHoverCell({ col: position.boardX, row: position.boardY })
+      gl.domElement.style.cursor = 'pointer'
+    } else {
+      setHoverCell(null)
+      gl.domElement.style.cursor = 'default'
+    }
   }
 
   const handlePointerLeave = () => {
     setHoverCell(null)
+    gl.domElement.style.cursor = 'default'
   }
 
   const handleClick = (event: ThreeEvent<MouseEvent>) => {
     event.stopPropagation()
-    if (!planeRef.current) return
+    if (!planeRef.current || !player) return
+
+    if(player.options.readonly || player.clientColor !== player.currentColor) {
+      return
+    }
 
     // Get intersection point in local coordinates
     const intersectionPoint = event.point.clone()
@@ -87,23 +88,27 @@ export default function Board({ gridTexture, player }: { gridTexture: THREE.Text
     if (!position) return
 
     const { boardX, boardY } = position
-    const stoneIndex = boardY * boardSize + boardX
+    player.shoot(boardX, boardY)
 
-    // Update the stones array in player object
-    player.stones[stoneIndex] = currentPlayer === 'black' ? 1 : 2
-
+    // player.add(1, boardX, boardY, false)
+    
+    // 此时页面不会重新渲染，需要改变state
     // Store the last placed stone position
-    setLastPlacedStone({ col: boardX, row: boardY })
+    // setLastPlacedStone({ col: boardX, row: boardY })
 
     // Switch player
-    setCurrentPlayer(currentPlayer === 'black' ? 'white' : 'black')
-    setHoverCell(null)
+    // setCurrentPlayer(currentPlayer === 'black' ? 'white' : 'black')
+    // setHoverCell(null)
   }
 
   // Prevent OrbitControls from capturing events when interacting with the board
   const handlePointerDown = (event: ThreeEvent<PointerEvent>) => {
     event.stopPropagation()
-    gl.domElement.style.cursor = 'pointer'
+    
+    // Only change cursor if we're hovering over a valid position
+    if (hoverCell) {
+      gl.domElement.style.cursor = 'pointer'
+    }
 
     // Temporarily disable orbit controls
     if (controls) {
@@ -117,7 +122,9 @@ export default function Board({ gridTexture, player }: { gridTexture: THREE.Text
 
   const handlePointerUp = (event: ThreeEvent<PointerEvent>) => {
     event.stopPropagation()
-    gl.domElement.style.cursor = 'auto'
+    
+    // Reset cursor based on hover state
+    gl.domElement.style.cursor = hoverCell ? 'pointer' : 'default'
 
     // Re-enable orbit controls
     if (controls) {
@@ -125,6 +132,14 @@ export default function Board({ gridTexture, player }: { gridTexture: THREE.Text
       controls.enabled = true
     }
   }
+
+  useEffect(() => {
+    if(player){
+      player.onSetHead((params: { col: number, row: number } | null) => {
+        setLastPlacedStone(params)
+      })
+    }
+  }, [player])
 
   return (
     <>
@@ -145,6 +160,7 @@ export default function Board({ gridTexture, player }: { gridTexture: THREE.Text
         onPointerUp={handlePointerUp}
         onPointerMove={handlePointerMove}
         onPointerLeave={handlePointerLeave}
+        userData={{ board: true }}
       >
         <planeGeometry args={[boardScale, boardScale]} />
         <meshBasicMaterial visible={false} />
@@ -155,7 +171,7 @@ export default function Board({ gridTexture, player }: { gridTexture: THREE.Text
         <mesh position={boardToWorldPosition(hoverCell.col, hoverCell.row)} scale-y={0.4}>
           <sphereGeometry args={[0.07, 32, 32]} />
           <meshStandardMaterial
-            color={currentPlayer === 'black' ? '#000000' : '#ffffff'}
+            color={player.currentColor === 1 ? '#000000' : '#ffffff'}
             transparent
             opacity={0.5}
             roughness={0.4}
@@ -165,7 +181,7 @@ export default function Board({ gridTexture, player }: { gridTexture: THREE.Text
       )}
 
       {/* Render stones */}
-      {player.stones.map((stoneValue: number, index: number) => {
+      {player?.pieces.map((stoneValue: number, index: number) => {
         if (stoneValue === 0) return null;
         const row = Math.floor(index / boardSize);
         const col = index % boardSize;
@@ -185,13 +201,10 @@ export default function Board({ gridTexture, player }: { gridTexture: THREE.Text
       {lastPlacedStone && (
         <Head
           position={boardToWorldPosition(lastPlacedStone.col, lastPlacedStone.row)}
-          stoneColor={player.stones[lastPlacedStone.row * boardSize + lastPlacedStone.col] === 1 ? 'black' : 'white'}
+          stoneColor={player.pieces[lastPlacedStone.row * boardSize + lastPlacedStone.col] === 1 ? 'black' : 'white'}
         />
       )}
 
-      <EffectComposer>
-        <Bloom intensity={0.1} luminanceThreshold={0.5} luminanceSmoothing={0.1} />
-      </EffectComposer>
     </>
   )
 }

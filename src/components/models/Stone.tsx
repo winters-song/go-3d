@@ -11,7 +11,7 @@ export default function Stone({ position, color }: { position: [number, number, 
 
   return (
     <mesh position={position} scale-y={0.4} castShadow>
-      <sphereGeometry args={[0.07, 32, 32]}  />
+      <sphereGeometry args={[0.07, 16, 16]}  />
       <meshStandardMaterial {...materialProps} />
     </mesh>
   )
