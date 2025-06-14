@@ -8,16 +8,20 @@ import {
   NewFileIcon,
   OpenFileIcon,
 } from './icons';
+import { useAppDispatch, useAppSelector } from '@/store/hooks'
+import { setCameraLock } from '@/store/cameraSlice'
+import { useCameraTopView } from '@/components/CursorManager'
+import * as THREE from 'three'
+import GoboardPlayer from '../go/GoboardPlayer'
 
 interface RightSidebarProps {
-  onNewFile?: () => void;
-  onOpenFile?: () => void;
-  onLockToggle?: (locked: boolean) => void;
-  onCameraTopView?: () => void;
+  player: GoboardPlayer;
 }
 
-export default function RightSidebar({ onNewFile, onOpenFile, onLockToggle, onCameraTopView }: RightSidebarProps) {
-  const [isLocked, setIsLocked] = useState(false);
+export default function RightSidebar({ player }: RightSidebarProps) {
+  const dispatch = useAppDispatch();
+  const isCameraLocked = useAppSelector((state) => state.camera.isLocked);
+  const handleCameraTopView = useCameraTopView();
   const [isFullscreen, setIsFullscreen] = useState(false);
 
   useEffect(() => {
@@ -30,9 +34,7 @@ export default function RightSidebar({ onNewFile, onOpenFile, onLockToggle, onCa
   }, []);
 
   const handleLockToggle = () => {
-    const newLockState = !isLocked;
-    setIsLocked(newLockState);
-    onLockToggle?.(newLockState);
+    dispatch(setCameraLock(!isCameraLocked));
   };
 
   const toggleFullscreen = async () => {
@@ -47,6 +49,37 @@ export default function RightSidebar({ onNewFile, onOpenFile, onLockToggle, onCa
     }
   };
 
+  const handleNewFile = () => {
+    console.log('New file clicked');
+    player.newSgf();
+  };
+
+  const handleOpenFile = () => {
+    console.log('Open file clicked');
+
+    const upload = (file: Blob) => {
+      let fileReader = new FileReader();
+      fileReader.onload = e => {
+        let sgf = fileReader.result as string;
+        player.changeData(sgf, 1)
+        player.toEnd()
+      };
+      fileReader.readAsText(file);
+      return false;
+    }
+
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.sgf';
+    input.onchange = (e: Event) => {
+      const target = e.target as HTMLInputElement;
+      if (target.files && target.files.length > 0) {
+        upload(target.files[0]);
+      }
+    };
+    input.click();
+  };
+
   return (
     <div className="fixed right-0 top-0 h-full w-16 flex flex-col items-center gap-4 py-4 z-10">
       <MusicToggle />
@@ -54,17 +87,17 @@ export default function RightSidebar({ onNewFile, onOpenFile, onLockToggle, onCa
       <button
         onClick={handleLockToggle}
         className={`w-10 h-10 rounded-lg transition-colors flex items-center justify-center cursor-pointer ${
-          isLocked 
+          isCameraLocked 
             ? 'bg-white text-black' 
             : 'bg-white/10 hover:bg-white/20 text-white'
         }`}
-        title={isLocked ? "Unlock Camera" : "Lock Camera"}
+        title={isCameraLocked ? "Unlock Camera" : "Lock Camera"}
       >
-        {isLocked ? <LockIcon /> : <UnlockIcon />}
+        {isCameraLocked ? <LockIcon /> : <UnlockIcon />}
       </button>
 
       <button
-        onClick={onCameraTopView}
+        onClick={handleCameraTopView}
         className="w-10 h-10 rounded-lg bg-white/10 hover:bg-white/20 transition-colors flex items-center justify-center text-white cursor-pointer"
         title="Top View"
       >
@@ -84,7 +117,7 @@ export default function RightSidebar({ onNewFile, onOpenFile, onLockToggle, onCa
       </button>
 
       <button
-        onClick={onNewFile}
+        onClick={handleNewFile}
         className="w-10 h-10 rounded-lg bg-white/10 hover:bg-white/20 transition-colors flex items-center justify-center text-white cursor-pointer"
         title="New File"
       >
@@ -92,7 +125,7 @@ export default function RightSidebar({ onNewFile, onOpenFile, onLockToggle, onCa
       </button>
 
       <button
-        onClick={onOpenFile}
+        onClick={handleOpenFile}
         className="w-10 h-10 rounded-lg bg-white/10 hover:bg-white/20 transition-colors flex items-center justify-center text-white cursor-pointer"
         title="Open File"
       >

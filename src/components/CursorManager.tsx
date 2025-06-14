@@ -1,65 +1,60 @@
-import { useEffect, useRef } from 'react'
-import { useThree } from '@react-three/fiber'
-import * as THREE from 'three'
+import { useRef, useEffect } from 'react'
+import { OrbitControls } from '@react-three/drei'
+import type { OrbitControls as OrbitControlsImpl } from 'three-stdlib'
+import { useAppSelector } from '@/store/hooks'
+import { useCameraControls } from '@/hooks/useCameraControls'
 
-interface CursorManagerProps {
-  isCameraLocked: boolean
+// Create a global event emitter for camera controls
+const cameraEvents = {
+  listeners: new Set<() => void>(),
+  emit() {
+    this.listeners.forEach(listener => listener());
+  },
+  subscribe(listener: () => void) {
+    this.listeners.add(listener);
+    return () => this.listeners.delete(listener);
+  }
+};
+
+export function useCameraTopView() {
+  return () => cameraEvents.emit();
 }
 
-export default function CursorManager({ isCameraLocked }: CursorManagerProps) {
-  const { gl, camera, scene } = useThree()
-  const raycaster = useRef(new THREE.Raycaster())
-  const mouse = useRef(new THREE.Vector2())
+export default function CursorManager() {
+  const controlsRef = useRef<OrbitControlsImpl>(null);
+  const isCameraLocked = useAppSelector((state) => state.camera.isLocked);
+  const { handleCameraTopView } = useCameraControls(controlsRef);
 
   useEffect(() => {
-    const handleMouseMove = (event: MouseEvent) => {
-      // Calculate mouse position in normalized device coordinates
-      const rect = gl.domElement.getBoundingClientRect()
-      mouse.current.x = ((event.clientX - rect.left) / rect.width) * 2 - 1
-      mouse.current.y = -((event.clientY - rect.top) / rect.height) * 2 + 1
-
-      // Update the raycaster
-      raycaster.current.setFromCamera(mouse.current, camera)
-
-      // Find intersections with objects that have board: true in userData
-      const intersects = raycaster.current.intersectObjects(scene.children, true)
-      const isOverBoard = intersects.some(intersect => 
-        intersect.object.userData?.board === true
-      )
-
-      // If not over the board and camera is unlocked, show grab cursor
-      if (!isOverBoard && !isCameraLocked) {
-        gl.domElement.style.cursor = 'grab'
+    const handleKeyPress = (event: KeyboardEvent) => {
+      if (event.key === 't' || event.key === 'T') {
+        handleCameraTopView();
       }
-    }
+    };
 
-    const handleMouseDown = () => {
-      // When mouse is down and camera is unlocked, show grabbing cursor
-      if (!isCameraLocked) {
-        gl.domElement.style.cursor = 'grabbing'
-      }
-    }
+    window.addEventListener('keydown', handleKeyPress);
+    return () => window.removeEventListener('keydown', handleKeyPress);
+  }, [handleCameraTopView]);
 
-    const handleMouseUp = () => {
-      // Reset to grab cursor when mouse is released
-      if (!isCameraLocked) {
-        gl.domElement.style.cursor = 'grab'
-      }
-    }
-
-    // Add event listeners
-    gl.domElement.addEventListener('mousemove', handleMouseMove)
-    gl.domElement.addEventListener('mousedown', handleMouseDown)
-    gl.domElement.addEventListener('mouseup', handleMouseUp)
-
-    // Reset cursor when component unmounts or camera is locked
+  useEffect(() => {
+    const cleanup = cameraEvents.subscribe(handleCameraTopView);
     return () => {
-      gl.domElement.removeEventListener('mousemove', handleMouseMove)
-      gl.domElement.removeEventListener('mousedown', handleMouseDown)
-      gl.domElement.removeEventListener('mouseup', handleMouseUp)
-      gl.domElement.style.cursor = 'default'
-    }
-  }, [gl, camera, scene, isCameraLocked])
+      cleanup();
+    };
+  }, [handleCameraTopView]);
 
-  return null
+  return (
+    <>
+      <OrbitControls
+        ref={controlsRef}
+        enablePan={false}
+        maxPolarAngle={Math.PI / 2}
+        minDistance={3}
+        maxDistance={10}
+        target={[0, 1.16, 0]}
+        makeDefault
+        enabled={!isCameraLocked}
+      />
+    </>
+  )
 } 
