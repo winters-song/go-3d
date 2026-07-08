@@ -1,166 +1,136 @@
-# Dependencies
-yarn add three @types/three @react-three/fiber @react-three/drei
+# Go 3D — 沉浸式围棋三维场景
 
-# compress GLB model
-```
-gltf-pipeline -i public/glb/room-baked.glb -o public/glb/room-baked.draco.glb --draco.compressionLevel=7
-gltf-pipeline -i public/glb/room-baked3.glb -o public/glb/room-baked.draco.glb --draco.compressionLevel=7
-gltf-pipeline -i public/glb/company.glb -o public/glb/company.draco.glb --draco.compressionLevel=7
+在日式和室中落子对弈，于榻榻米与庭园之间复盘棋谱。本项目基于 **Next.js**、**Three.js** 与 **React Three Fiber** 构建，将传统围棋与高品质 3D 渲染结合，提供可交互的棋盘、棋谱回放与多场景切换体验。
 
-# Go 3D Application
+![围棋 3D 场景预览](./screenshot.jpg)
 
-A 3D Go game application built with Next.js, Three.js, and React Three Fiber.
+## 场景概览
 
-## Features
+主场景还原了一间典型的日式和室（Washitsu）：
 
-- 3D Go board with interactive stones
-- Real-time backend communication via iframe
-- Model manipulation (color, position)
-- Game move handling
-- Sound effects
-- Camera controls
+- **榻榻米地面**与木质立柱，营造安静对弈氛围
+- **障子门**外是绿意盎然的庭园，远处石灯笼点缀景深
+- 中央摆放传统**木制围棋盘**，黑白棋子带有真实材质与阴影
+- **HDR 环境光**与柔和阴影，让室内与室外光线自然过渡
 
-## Backend Communication
+底部工具栏显示当前手数（如「第 4 步」），支持棋谱逐步前进、后退与跳转；右侧提供音效、视角锁定、全屏、俯视等快捷操作。
 
-The application uses an iframe-based backend communication system where:
+## 主要功能
 
-1. **Backend Page**: Located at `/src/app/backend/page.tsx`, serves as the backend logic
-2. **Communication Service**: `BackendCommunication` class handles postMessage communication
-3. **Iframe Integration**: The backend is embedded as a hidden iframe in the main page
+- **3D 围棋盘** — 19 路棋盘，支持落子、提子与棋形展示
+- **棋谱回放** — 加载 SGF 文件，支持逐步/跳步浏览与分支变化
+- **场景切换** — 多套 3D 场景（和室、公司会议室、日落户外等）
+- **相机控制** — 自由旋转、俯视、锁定视角、全屏模式
+- **音效** — 落子音效，可一键开关
+- **KataGo 集成** — 对接 KataGo 引擎进行 AI 分析（见 `KataGoService`）
+- **后端通信** — 基于 iframe + `postMessage` 的跨页面消息通道，便于嵌入与扩展
 
-### How it works
+## 技术栈
 
-1. The main page loads with a hidden iframe pointing to `/backend`
-2. The `BackendCommunication` service is connected to the iframe
-3. Messages are sent via `postMessage` between the main page and iframe
-4. The backend processes messages and sends responses back
+| 类别 | 技术 |
+|------|------|
+| 框架 | Next.js 15、React 19 |
+| 3D 渲染 | Three.js、@react-three/fiber、@react-three/drei |
+| 后处理 | @react-three/postprocessing |
+| 状态管理 | Redux Toolkit |
+| 样式 | Tailwind CSS 4 |
+| 模型 | GLB / Draco 压缩模型 |
 
-### Message Types
+## 快速开始
 
-- `request_model_info` - Get current model state
-- `request_scene_config` - Get scene configuration
-- `update_model_color` - Update model color
-- `update_model_position` - Update model position
-- `game_move` - Send a game move
-- `play_sound` - Play a sound effect
-- `update_camera` - Update camera position
-- `toggle_lighting` - Toggle scene lighting
-- `update_environment` - Update environment
+### 环境要求
 
-## Development
+- Node.js 18+
+- Yarn 或 npm
 
-### Prerequisites
-
-- Node.js 18+ 
-- npm or yarn
-
-### Installation
+### 安装与运行
 
 ```bash
-npm install
+# 安装依赖
+yarn install
+
+# 启动开发服务器
+yarn dev
 ```
 
-### Running the Application
+浏览器访问 [http://localhost:3000](http://localhost:3000) 即可进入主场景。
+
+### 其他命令
 
 ```bash
-npm run dev
+yarn build    # 生产构建
+yarn start    # 启动生产服务
+yarn lint     # 代码检查
 ```
 
-The application will be available at `http://localhost:3000`
+## 页面路由
 
-### Testing Backend Communication
+| 路径 | 说明 |
+|------|------|
+| `/` | 主场景 — 日式和室围棋对弈 |
+| `/zen` | 与主场景相同（禅意和室） |
+| `/company` | 公司会议室场景 |
+| `/sunset` | 日落户外场景 |
+| `/preview` | 3D 模型预览工具 |
+| `/backend` | 后端逻辑 iframe 页面 |
+| `/test-backend` | 后端通信测试页 |
 
-Visit `http://localhost:3000/test-backend` to test the iframe communication system.
-
-## Project Structure
+## 项目结构
 
 ```
 src/
-├── app/
-│   ├── backend/           # Backend iframe page
-│   ├── test-backend/      # Backend communication test page
-│   └── page.tsx          # Main application page
+├── app/                    # Next.js 页面路由
+│   ├── page.tsx            # 主场景入口
+│   ├── company/            # 会议室场景
+│   ├── sunset/             # 日落场景
+│   └── api/                # API 路由（对局、落子等）
 ├── components/
-│   ├── BackendControls.tsx  # UI controls for backend communication
-│   └── ...
+│   ├── go/                 # 围棋逻辑（棋盘、棋谱、播放器）
+│   ├── models/             # 3D 模型组件（房间、棋盘、棋子）
+│   └── ui/                 # 界面（底栏、侧栏、导航按钮）
 ├── services/
-│   └── BackendCommunication.ts  # Communication service
-└── ...
+│   ├── BackendCommunication.ts  # iframe 消息通信
+│   └── KataGoService.ts         # KataGo 引擎对接
+├── store/                  # Redux 状态（相机等）
+└── tools/                  # 模型转换与处理工具
+
+public/
+├── glb/                    # 3D 场景模型（Draco 压缩）
+├── draco/                  # Draco 解码器
+└── hdri/                   # HDR 环境贴图
 ```
 
-## Usage Examples
+## 模型压缩
 
-### Basic Communication
+使用 `gltf-pipeline` 对 GLB 模型进行 Draco 压缩，减小加载体积：
+
+```bash
+gltf-pipeline -i public/glb/room-baked.glb -o public/glb/room-baked.draco.glb --draco.compressionLevel=7
+gltf-pipeline -i public/glb/company.glb -o public/glb/company.draco.glb --draco.compressionLevel=7
+```
+
+## 棋谱使用
+
+1. 点击右侧栏的「打开文件」图标
+2. 选择 `.sgf` 棋谱文件
+3. 使用底部导航按钮逐步浏览，或跳转至开局/终局
+
+## 后端通信
+
+应用通过隐藏 iframe 与 `/backend` 页面进行 `postMessage` 通信，支持模型状态查询、落子、音效、相机与环境更新等消息类型。详细 API 见 [API_DOCUMENTATION.md](./API_DOCUMENTATION.md)。
 
 ```typescript
 import { backendComm } from '@/services/BackendCommunication'
 
-// Update model color
-await backendComm.updateModelColor('#ff0000')
-
-// Send game move
+// 发送落子
 await backendComm.sendGameMove({ col: 3, row: 3, color: 1 })
 
-// Listen for updates
+// 监听模型更新
 backendComm.on('model_update', (data) => {
-  console.log('Model updated:', data)
+  console.log('模型已更新:', data)
 })
 ```
 
-### Model Manipulation
+## 许可证
 
-```typescript
-// Update model position
-await backendComm.updateModelPosition([1, 2, 3])
-
-// Update multiple properties
-await backendComm.updateModel({
-  color: '#00ff00',
-  position: [0, 1, 0]
-})
-```
-
-### Scene Configuration
-
-```typescript
-// Toggle lighting
-await backendComm.toggleLighting(false)
-
-// Update camera
-await backendComm.updateCameraPosition([5, 5, 5])
-
-// Update environment
-await backendComm.updateEnvironment('forest')
-```
-
-## Backend State
-
-The backend maintains the following state:
-
-- **Model State**: Color, position, visibility
-- **Scene Config**: Lighting, environment, camera settings
-- **Message Queue**: Recent messages for debugging
-
-## Benefits of Iframe Approach
-
-1. **No separate server needed** - Backend runs within the same Next.js application
-2. **Isolated environment** - Backend logic is separated from frontend
-3. **Real-time communication** - Fast postMessage communication
-4. **Easy debugging** - Can access backend page directly at `/backend`
-5. **No CORS issues** - Same-origin communication
-
-## Troubleshooting
-
-### Iframe not loading
-- Check that the backend page is accessible at `/backend`
-- Verify the iframe src is correct
-
-### Communication not working
-- Check browser console for errors
-- Verify the iframe is properly connected to the communication service
-- Test communication using the test page at `/test-backend`
-
-### Messages not received
-- Check that message types match between frontend and backend
-- Verify the message listener is properly set up
-- Check for any JavaScript errors in the backend iframe
+本项目为私有学习项目（`private: true`）。
