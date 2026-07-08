@@ -47,11 +47,11 @@ export default function CursorManager() {
     <>
       <OrbitControls
         ref={controlsRef}
-        enablePan={false}
+        enablePan={true}
         maxPolarAngle={Math.PI / 2}
-        minDistance={3}
-        maxDistance={10}
-        target={[0, 1.16, 0]}
+        minDistance={5}
+        maxDistance={50}
+        target={[0, 2, 0]}
         makeDefault
         enabled={!isCameraLocked}
       />

@@ -7,6 +7,9 @@ module.exports = {
   ],
   theme: {
     extend: {
+      fontFamily: {
+        'inter': ['Inter', 'Arial', 'Helvetica', 'sans-serif'],
+      },
       animation: {
         'spin-slow': 'spin 6s linear infinite',
       },

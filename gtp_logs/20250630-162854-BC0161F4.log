@@ -1,0 +1,46 @@
+2025-06-30 16:28:54+0800: Running with following config:
+allowResignation = true
+lagBuffer = 1.0
+logAllGTPCommunication = true
+logDir = gtp_logs
+logSearchInfo = true
+logSearchInfoForChosenMove = false
+logToStderr = false
+maxTimePondering = 60.0
+maxVisits = 500
+numSearchThreads = 6
+ponderingEnabled = false
+resignConsecTurns = 3
+resignThreshold = -0.90
+rules = tromp-taylor
+searchFactorAfterOnePass = 0.50
+searchFactorAfterTwoPass = 0.25
+searchFactorWhenWinning = 0.40
+searchFactorWhenWinningThreshold = 0.95
+
+2025-06-30 16:28:54+0800: GTP Engine starting...
+2025-06-30 16:28:54+0800: KataGo v1.15.3
+2025-06-30 16:28:54+0800: Using TrompTaylor rules initially, unless GTP/GUI overrides this
+2025-06-30 16:28:54+0800: Using 6 CPU thread(s) for search
+2025-06-30 16:28:54+0800: nnRandSeed0 = 17669140568168114818
+2025-06-30 16:28:54+0800: After dedups: nnModelFile0 = /usr/local/Cellar/katago/1.15.3/share/katago/g170-b30c320x2-s4824661760-d1229536699.bin.gz useFP16 auto useNHWC auto
+2025-06-30 16:28:54+0800: Initializing neural net buffer to be size 19 * 19 exactly
+2025-06-30 16:28:57+0800: Found OpenCL Platform 0: Apple (Apple) (OpenCL 1.2 (Apr 18 2025 21:45:30))
+2025-06-30 16:28:57+0800: Found 3 device(s) on platform 0 with type CPU or GPU or Accelerator
+2025-06-30 16:28:57+0800: Found OpenCL Device 0: Intel(R) Core(TM) i9-9880H CPU @ 2.30GHz (Intel) (score 102)
+2025-06-30 16:28:57+0800: Found OpenCL Device 1: Intel(R) UHD Graphics 630 (Intel Inc.) (score 6000102)
+2025-06-30 16:28:57+0800: Found OpenCL Device 2: AMD Radeon Pro 5500M Compute Engine (AMD) (score 11000102)
+2025-06-30 16:28:57+0800: Creating context for OpenCL Platform: Apple (Apple) (OpenCL 1.2 (Apr 18 2025 21:45:30))
+2025-06-30 16:28:57+0800: Using OpenCL Device 2: AMD Radeon Pro 5500M Compute Engine (AMD) OpenCL 1.2  (Extensions: cl_APPLE_SetMemObjectDestructor cl_APPLE_ContextLoggingFunctions cl_APPLE_clut cl_APPLE_query_kernel_names cl_APPLE_gl_sharing cl_khr_gl_event cl_khr_global_int32_base_atomics cl_khr_global_int32_extended_atomics cl_khr_local_int32_base_atomics cl_khr_local_int32_extended_atomics cl_khr_byte_addressable_store cl_khr_depth_images cl_APPLE_command_queue_priority cl_APPLE_command_queue_select_compute_units cl_khr_fp64)
+2025-06-30 16:28:57+0800: Loaded tuning parameters from: /Users/winters/.katago/opencltuning/tune11_gpuAMDRadeonPro5500MComputeEngine_x19_y19_c320_mv8.txt
+2025-06-30 16:29:01+0800: OpenCL backend thread 0: Model version 8
+2025-06-30 16:29:01+0800: OpenCL backend thread 0: Model name: g170-b30c320x2-s4824661760-d1229536699
+2025-06-30 16:29:03+0800: OpenCL backend thread 0: FP16Storage false FP16Compute false FP16TensorCores false FP16TensorCoresFor1x1 false
+2025-06-30 16:29:03+0800: Loaded neural net with nnXLen 19 nnYLen 19
+2025-06-30 16:29:03+0800: Initializing board with boardXSize 19 boardYSize 19
+2025-06-30 16:29:03+0800: Loaded config /usr/local/Cellar/katago/1.15.3/share/katago/configs/gtp_example.cfg
+2025-06-30 16:29:03+0800: Loaded model /usr/local/Cellar/katago/1.15.3/share/katago/g170-b30c320x2-s4824661760-d1229536699.bin.gz
+2025-06-30 16:29:03+0800: Model name: g170-b30c320x2-s4824661760-d1229536699
+2025-06-30 16:29:03+0800: GTP ready, beginning main protocol loop
+2025-06-30 16:29:03+0800: Controller: boardsize 19
+2025-06-30 16:29:03+0800: = 

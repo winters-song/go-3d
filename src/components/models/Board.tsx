@@ -3,10 +3,12 @@ import * as THREE from 'three'
 import { ThreeEvent, useThree } from '@react-three/fiber'
 import Stone from './Stone'
 import Head from './Head'
+import { ContactShadows } from '@react-three/drei'
 
 export default function Board({ player }: { player: any }) {
   const [hoverCell, setHoverCell] = useState<{ col: number, row: number } | null>(null)
   const [lastPlacedStone, setLastPlacedStone] = useState<{ col: number, row: number } | null>(null)
+  const [showShadow, setShowShadow] = useState(false)
   const planeRef = useRef<THREE.Mesh>(null!)
   const { gl, controls } = useThree()
   const boardSize = 19
@@ -141,9 +143,15 @@ export default function Board({ player }: { player: any }) {
     }
   }, [player])
 
+  useEffect(() => {
+    setTimeout(() => {
+      setShowShadow(true)
+      console.log('showShadow', showShadow)
+    }, 3000)
+  }, [])
+
   return (
     <>
-
       {/* Grid texture plane */}
       {/* <mesh rotation-x={-Math.PI * 0.5} position-y={1.604} >
         <planeGeometry args={[gridScale, gridScale]} />
@@ -151,11 +159,12 @@ export default function Board({ player }: { player: any }) {
         <meshLambertMaterial transparent opacity={1} map={gridTexture} emissive={'cyan'} emissiveIntensity={1.4} toneMapped={false} /> 
       </mesh> */}
 
+
       {/* Invisible plane for click detection */}
       <mesh
         ref={planeRef}
         rotation-x={-Math.PI * 0.5}
-        position-y={1.61}
+        position-y={1.62}
         onPointerDown={handlePointerDown}
         onPointerUp={handlePointerUp}
         onPointerMove={handlePointerMove}
@@ -163,7 +172,7 @@ export default function Board({ player }: { player: any }) {
         userData={{ board: true }}
       >
         <planeGeometry args={[boardScale, boardScale]} />
-        <meshBasicMaterial visible={false} />
+        <meshStandardMaterial visible={false} />
       </mesh>
 
       {/* Preview stone */}

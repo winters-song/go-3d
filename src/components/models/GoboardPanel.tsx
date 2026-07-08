@@ -6,7 +6,9 @@ import Audio from  '../Audio/Audio'
 
 export default function GoboardPanel({ player }: { player: GoboardPlayer }) {
   const [goboard] = useState(() => {
-    const newGoboard = new Goboard_3d({});
+    const newGoboard = new Goboard_3d({
+      
+    });
     player.cb = newGoboard;
     player.newSgf();
     return newGoboard;

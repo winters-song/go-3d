@@ -14,7 +14,7 @@ export function useCameraControls(controlsRef: React.RefObject<OrbitControlsImpl
       
       // Calculate the end position (directly above the board)
       const endPosition = new THREE.Vector3(0, 6.5, 0.1);
-      const endTarget = new THREE.Vector3(0, 1.16, 0);
+      const endTarget = new THREE.Vector3(0, 2, 0);
       
       // Animation parameters
       const duration = 1000; // 1 second
