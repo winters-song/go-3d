@@ -12,6 +12,7 @@ import { useAppDispatch, useAppSelector } from '@/store/hooks'
 import { setCameraLock } from '@/store/cameraSlice'
 import { useCameraTopView } from '@/components/CursorManager'
 import GoboardPlayer from '../go/GoboardPlayer'
+import Tooltip from './Tooltip'
 
 interface RightSidebarProps {
   player: GoboardPlayer;
@@ -80,53 +81,58 @@ export default function RightSidebar({ player }: RightSidebarProps) {
     <div className="fixed right-0 top-0 h-full w-16 flex flex-col items-center gap-4 py-4 z-10">
       <MusicToggle />
       
-      <button
-        onClick={handleLockToggle}
-        className={`w-10 h-10 rounded-lg transition-colors flex items-center justify-center cursor-pointer ${
-          isCameraLocked 
-            ? 'bg-white text-black' 
-            : 'bg-white/10 hover:bg-white/20 text-white'
-        }`}
-        title={isCameraLocked ? "Unlock Camera" : "Lock Camera"}
-      >
-        {isCameraLocked ? <LockIcon /> : <UnlockIcon />}
-      </button>
+      <Tooltip label={isCameraLocked ? "Unlock Camera" : "Lock Camera"}>
+        <button
+          onClick={handleLockToggle}
+          className={`w-10 h-10 rounded-lg transition-colors flex items-center justify-center cursor-pointer ${
+            isCameraLocked 
+              ? 'bg-white text-black' 
+              : 'bg-white/10 hover:bg-white/20 text-white'
+          }`}
+        >
+          {isCameraLocked ? <LockIcon /> : <UnlockIcon />}
+        </button>
+      </Tooltip>
 
-      <button
-        onClick={handleCameraTopView}
-        className="w-10 h-10 rounded-lg bg-white/10 hover:bg-white/20 transition-colors flex items-center justify-center text-white cursor-pointer"
-        title="Top View"
-      >
-        <TopViewIcon />
-      </button>
+      <Tooltip label="Top View">
+        <button
+          onClick={handleCameraTopView}
+          className="w-10 h-10 rounded-lg bg-white/10 hover:bg-white/20 transition-colors flex items-center justify-center text-white cursor-pointer"
+        >
+          <TopViewIcon />
+        </button>
+      </Tooltip>
 
-      <button
-        onClick={toggleFullscreen}
-        className={`w-10 h-10 rounded-lg transition-colors flex items-center justify-center cursor-pointer ${
-          isFullscreen 
-            ? 'bg-white text-black' 
-            : 'bg-white/10 hover:bg-white/20 text-white'
-        }`}
-        title={isFullscreen ? "Exit Fullscreen" : "Enter Fullscreen"}
-      >
-        <EnterFullscreenIcon />
-      </button>
+      <Tooltip label={isFullscreen ? "Exit Fullscreen" : "Enter Fullscreen"}>
+        <button
+          onClick={toggleFullscreen}
+          className={`w-10 h-10 rounded-lg transition-colors flex items-center justify-center cursor-pointer ${
+            isFullscreen 
+              ? 'bg-white text-black' 
+              : 'bg-white/10 hover:bg-white/20 text-white'
+          }`}
+        >
+          <EnterFullscreenIcon />
+        </button>
+      </Tooltip>
 
-      <button
-        onClick={handleNewFile}
-        className="w-10 h-10 rounded-lg bg-white/10 hover:bg-white/20 transition-colors flex items-center justify-center text-white cursor-pointer"
-        title="New File"
-      >
-        <NewFileIcon />
-      </button>
+      <Tooltip label="New File">
+        <button
+          onClick={handleNewFile}
+          className="w-10 h-10 rounded-lg bg-white/10 hover:bg-white/20 transition-colors flex items-center justify-center text-white cursor-pointer"
+        >
+          <NewFileIcon />
+        </button>
+      </Tooltip>
 
-      <button
-        onClick={handleOpenFile}
-        className="w-10 h-10 rounded-lg bg-white/10 hover:bg-white/20 transition-colors flex items-center justify-center text-white cursor-pointer"
-        title="Open File"
-      >
-        <OpenFileIcon />
-      </button>
+      <Tooltip label="Open File">
+        <button
+          onClick={handleOpenFile}
+          className="w-10 h-10 rounded-lg bg-white/10 hover:bg-white/20 transition-colors flex items-center justify-center text-white cursor-pointer"
+        >
+          <OpenFileIcon />
+        </button>
+      </Tooltip>
     </div>
   );
 } 

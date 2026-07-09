@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { MusicNoteIcon, MusicNoteOffIcon } from "./ui/icons";
+import Tooltip from "./ui/Tooltip";
 import { useSceneEntry } from "@/contexts/SceneEntryContext";
 
 // Music toggle button component
@@ -53,14 +54,16 @@ export default function MusicToggle() {
   };
 
   return (
-    <button 
-      onClick={toggleMusic}
-      className="bg-black/30 backdrop-blur-sm p-2 rounded-full hover:bg-black/50 transition-colors cursor-pointer"
-      aria-label={playing ? "Pause music" : "Play music"}
-    >
-      <div className={playing ? "animate-[spin_6s_linear_infinite]" : ""}>
-        {playing ? <MusicNoteOffIcon className="text-white" /> : <MusicNoteIcon className="text-white" />}
-      </div>
-    </button>
+    <Tooltip label={playing ? "Pause music" : "Play music"}>
+      <button 
+        onClick={toggleMusic}
+        className="bg-black/30 backdrop-blur-sm p-2 rounded-full hover:bg-black/50 transition-colors cursor-pointer"
+        aria-label={playing ? "Pause music" : "Play music"}
+      >
+        <div className={playing ? "animate-[spin_6s_linear_infinite]" : ""}>
+          {playing ? <MusicNoteOffIcon className="text-white" /> : <MusicNoteIcon className="text-white" />}
+        </div>
+      </button>
+    </Tooltip>
   );
 }
