@@ -7,7 +7,9 @@ import {
   EnterFullscreenIcon,
   NewFileIcon,
   OpenFileIcon,
+  InfoIcon,
 } from './icons';
+import PageInfoModal from './PageInfoModal';
 import { useAppDispatch, useAppSelector } from '@/store/hooks'
 import { setCameraLock } from '@/store/cameraSlice'
 import { useCameraTopView } from '@/components/CursorManager'
@@ -23,6 +25,7 @@ export default function RightSidebar({ player }: RightSidebarProps) {
   const isCameraLocked = useAppSelector((state) => state.camera.isLocked);
   const handleCameraTopView = useCameraTopView();
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [infoOpen, setInfoOpen] = useState(false);
 
   useEffect(() => {
     const handleFullscreenChange = () => {
@@ -78,7 +81,8 @@ export default function RightSidebar({ player }: RightSidebarProps) {
   };
 
   return (
-    <div className="fixed right-0 top-0 h-full w-16 flex flex-col items-center gap-4 py-4 z-10">
+    <>
+    <div className="fixed right-0 top-0 h-full w-16 flex flex-col items-center gap-4 py-4 pb-24 z-20">
       <MusicToggle />
       
       <Tooltip label={isCameraLocked ? "Unlock Camera" : "Lock Camera"}>
@@ -133,6 +137,21 @@ export default function RightSidebar({ player }: RightSidebarProps) {
           <OpenFileIcon />
         </button>
       </Tooltip>
+
+      <div className="mt-auto">
+        <Tooltip label="关于">
+          <button
+            onClick={() => setInfoOpen(true)}
+            className="w-10 h-10 rounded-lg bg-white/10 hover:bg-white/20 transition-colors flex items-center justify-center text-white cursor-pointer"
+            aria-label="关于"
+          >
+            <InfoIcon />
+          </button>
+        </Tooltip>
+      </div>
     </div>
+
+    <PageInfoModal open={infoOpen} onClose={() => setInfoOpen(false)} />
+    </>
   );
 } 
