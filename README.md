@@ -2,7 +2,7 @@
 
 > 个人项目 Demo · 日式和室中的 3D 围棋对弈与棋谱回放
 
-[![Live Demo](https://img.shields.io/badge/demo-部署后填入链接-blue)](#在线体验)
+[![Live Demo](https://img.shields.io/badge/demo-go--3d--three.vercel.app-blue)](https://go-3d-three.vercel.app/)
 ![Next.js](https://img.shields.io/badge/Next.js-15-black)
 ![Three.js](https://img.shields.io/badge/Three.js-r176-green)
 
@@ -14,7 +14,7 @@
 
 | | |
 |---|---|
-| **Live Demo** | _部署后填入，如 `https://go-3d.vercel.app`_ |
+| **Live Demo** | [https://go-3d-three.vercel.app/](https://go-3d-three.vercel.app/) |
 | **演示录屏** | 建议补充 30s GIF（落子 → 棋谱回放 → 视角切换），可放在 `docs/demo.gif` |
 
 > 本地运行：`yarn install && yarn dev`，访问 [http://localhost:3000](http://localhost:3000)
@@ -97,7 +97,7 @@ yarn build
 # 推荐 Vercel 一键部署，构建命令 yarn build，输出 .next
 ```
 
-部署后将 Live Demo 链接更新到本 README 顶部徽章。
+Live Demo 已部署于 [https://go-3d-three.vercel.app/](https://go-3d-three.vercel.app/)。
 
 ## 更多（非 Demo 重点）
 
