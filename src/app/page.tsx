@@ -1,46 +1,44 @@
-"use client"
-import * as THREE from 'three'
-import { Canvas } from '@react-three/fiber'
-import { useRef, Suspense, useEffect } from 'react'
-import { useGLTF, Preload, Stats, Environment } from "@react-three/drei"
-import Lights from '@/components/models/Lights'
-import GoboardPlayer from '@/components/go/GoboardPlayer'
-import BottomBar from '@/components/ui/BottomBar'
-import RightSidebar from '@/components/ui/RightSidebar'
-import GoboardPanel from '@/components/models/GoboardPanel'
-import CursorManager from '@/components/CursorManager'
-import SceneIntro from '@/components/models/SceneIntro'
-import LoadingReporter from '@/components/models/LoadingReporter'
-import SceneEntryOverlay from '@/components/ui/SceneEntryOverlay'
+'use client';
+import * as THREE from 'three';
+import { Canvas } from '@react-three/fiber';
+import { useRef, Suspense, useEffect } from 'react';
+import { useGLTF, Preload, Stats, Environment } from '@react-three/drei';
+import Lights from '@/components/models/Lights';
+import GoboardPlayer from '@/components/go/GoboardPlayer';
+import BottomBar from '@/components/ui/BottomBar';
+import RightSidebar from '@/components/ui/RightSidebar';
+import GoboardPanel from '@/components/models/GoboardPanel';
+import CursorManager from '@/components/CursorManager';
+import SceneIntro from '@/components/models/SceneIntro';
+import LoadingReporter from '@/components/models/LoadingReporter';
+import SceneEntryOverlay from '@/components/ui/SceneEntryOverlay';
 
 function SceneContent() {
-  const { scene: roomScene } = useGLTF('/glb/room-baked.draco.glb')
+  const { scene: roomScene } = useGLTF('/glb/room-baked.draco.glb');
 
   useEffect(() => {
-    roomScene.traverse((child) => {
+    roomScene.traverse(child => {
       if (child instanceof THREE.Mesh && child.name.includes('WoodBase')) {
-        child.receiveShadow = true
+        child.receiveShadow = true;
       }
-    })
-  }, [roomScene])
+    });
+  }, [roomScene]);
 
-  return (
-    <primitive object={roomScene} position={[0, 0.21, -0.01]} scale={3.2} />
-  )
+  return <primitive object={roomScene} position={[0, 0.21, -0.01]} scale={3.2} />;
 }
 
 export default function Home() {
-  const playerRef = useRef<GoboardPlayer | null>(null)
+  const playerRef = useRef<GoboardPlayer | null>(null);
   if (!playerRef.current) {
     playerRef.current = new GoboardPlayer({
       boardOptions: {
         showOrder: false,
         showCoordinates: false,
-        playConfirm: false
-      }
-    })
+        playConfirm: false,
+      },
+    });
   }
-  const player = playerRef.current
+  const player = playerRef.current;
 
   return (
     <>
@@ -56,13 +54,17 @@ export default function Home() {
         }}
         gl={{
           antialias: true,
-          powerPreference: 'high-performance'
+          powerPreference: 'high-performance',
         }}
         frameloop="demand"
       >
         <Suspense fallback={<LoadingReporter />}>
           <LoadingReporter />
-          <Environment files='/hdri/forest_slope_1k.hdr' background={'only'} backgroundBlurriness={0.1} />
+          <Environment
+            files="/hdri/forest_slope_1k.hdr"
+            background={'only'}
+            backgroundBlurriness={0.1}
+          />
           <CursorManager />
           <Lights />
           <GoboardPanel player={player} />
@@ -78,4 +80,4 @@ export default function Home() {
   );
 }
 
-useGLTF.preload('/glb/room-baked.draco.glb')
+useGLTF.preload('/glb/room-baked.draco.glb');

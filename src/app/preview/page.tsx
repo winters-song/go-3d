@@ -20,15 +20,15 @@ interface StatusMessage {
 // Custom DRACO Loader from summer.ts
 const decoder = new TextDecoder();
 const TYPED_ARRAYS = [
-  "Int8Array", 
-  "Uint8Array", 
-  "Uint8ClampedArray", 
-  "Int16Array", 
-  "Uint16Array", 
-  "Int32Array", 
-  "Uint32Array", 
-  "Float32Array", 
-  "Float64Array"
+  'Int8Array',
+  'Uint8Array',
+  'Uint8ClampedArray',
+  'Int16Array',
+  'Uint16Array',
+  'Int32Array',
+  'Uint32Array',
+  'Float32Array',
+  'Float64Array',
 ];
 
 interface AttributeData {
@@ -63,14 +63,16 @@ class CustomDRACOLoader extends DRACOLoader {
     this.preload();
   }
 
-  async loadFromFile(file: File): Promise<{ geometry: THREE.BufferGeometry; materials?: MaterialData[] }> {
+  async loadFromFile(
+    file: File
+  ): Promise<{ geometry: THREE.BufferGeometry; materials?: MaterialData[] }> {
     try {
       const arrayBuffer = await file.arrayBuffer();
-      
+
       const metadataLength = parseInt(decoder.decode(arrayBuffer.slice(0, 10)));
       const metadataStr = decoder.decode(arrayBuffer.slice(10, 10 + metadataLength));
       const geometryData = arrayBuffer.slice(10 + metadataLength);
-      
+
       const metadata: GeometryMetadata = JSON.parse(metadataStr);
       const attributeIDs: AttributeData = {};
       const attributeTypes: AttributeTypes = {};
@@ -87,40 +89,48 @@ class CustomDRACOLoader extends DRACOLoader {
       const geometry = await (this as any).decodeGeometry(geometryData, {
         attributeIDs,
         attributeTypes,
-        useUniqueIDs: true
+        useUniqueIDs: true,
       });
-      
+
       // Add metadata to userData for debugging
       geometry.userData = {
         isPlaceholder: true,
         originalDataSize: geometryData.byteLength,
         attributeIDs,
         attributeTypes,
-        metadata
+        metadata,
       };
 
-      return { 
+      return {
         geometry,
-        materials: metadata.materials || undefined
+        materials: metadata.materials || undefined,
       };
     } catch (error) {
-      throw new Error(`Could not load file: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      throw new Error(
+        `Could not load file: ${error instanceof Error ? error.message : 'Unknown error'}`
+      );
     }
   }
 }
 
 // Model Component
-function Model({ geometry, materials }: { geometry: THREE.BufferGeometry; materials?: MaterialData[] }) {
+function Model({
+  geometry,
+  materials,
+}: {
+  geometry: THREE.BufferGeometry;
+  materials?: MaterialData[];
+}) {
   // Use the first material from the file, or fall back to default
   const materialData = materials && materials.length > 0 ? materials[0] : null;
-  
-  // const material = new THREE.MeshStandardMaterial({ 
+
+  // const material = new THREE.MeshStandardMaterial({
   //   color: materialData?.color ?? 0x888888,
   //   roughness: materialData?.roughness ?? 0.5,
   //   metalness: materialData?.metalness ?? 0.1,
   //   opacity: materialData?.opacity ?? 1.0,
   //   transparent: materialData?.transparent ?? false,
-  //   side: materialData?.side === 'double' ? THREE.DoubleSide : 
+  //   side: materialData?.side === 'double' ? THREE.DoubleSide :
   //         materialData?.side === 'back' ? THREE.BackSide : THREE.FrontSide
   // });
   const material = new THREE.MeshNormalMaterial();
@@ -133,7 +143,13 @@ function Model({ geometry, materials }: { geometry: THREE.BufferGeometry; materi
 }
 
 // Scene Component
-function Scene({ geometry, materials }: { geometry: THREE.BufferGeometry | null; materials?: MaterialData[] }) {
+function Scene({
+  geometry,
+  materials,
+}: {
+  geometry: THREE.BufferGeometry | null;
+  materials?: MaterialData[];
+}) {
   return (
     <>
       <ambientLight intensity={0.6} />
@@ -154,9 +170,12 @@ export default function PreviewPage() {
   const dropZoneRef = useRef<HTMLDivElement>(null);
   const loaderRef = useRef<CustomDRACOLoader | null>(null);
 
-  const updateStatus = useCallback((message: string, type: StatusMessage['type'] = 'info', progress?: number) => {
-    setStatus({ message, type, progress });
-  }, []);
+  const updateStatus = useCallback(
+    (message: string, type: StatusMessage['type'] = 'info', progress?: number) => {
+      setStatus({ message, type, progress });
+    },
+    []
+  );
 
   const formatFileSize = (bytes: number): string => {
     if (bytes === 0) return '0 Bytes';
@@ -170,25 +189,28 @@ export default function PreviewPage() {
     setIsLoading(true);
     setGeometry(null);
     setMaterials(undefined);
-    
+
     try {
       updateStatus(`Loading ${selectedFile.name}...`, 'progress', 10);
-      
+
       if (!loaderRef.current) {
         loaderRef.current = new CustomDRACOLoader();
       }
-      
+
       updateStatus(`Parsing geometry data...`, 'progress', 50);
-      const { geometry: loadedGeometry, materials: loadedMaterials } = await loaderRef.current.loadFromFile(selectedFile);
-      
+      const { geometry: loadedGeometry, materials: loadedMaterials } =
+        await loaderRef.current.loadFromFile(selectedFile);
+
       updateStatus(`Rendering model...`, 'progress', 90);
       setGeometry(loadedGeometry);
       setMaterials(loadedMaterials);
-      
+
       updateStatus(`Successfully loaded ${selectedFile.name}`, 'success', 100);
-      
     } catch (error) {
-      updateStatus(`Failed to load file: ${error instanceof Error ? error.message : 'Unknown error'}`, 'error');
+      updateStatus(
+        `Failed to load file: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        'error'
+      );
     } finally {
       setIsLoading(false);
     }
@@ -199,7 +221,7 @@ export default function PreviewPage() {
     if (selectedFile && selectedFile.name.endsWith('.bin')) {
       const fileItem: FileItem = {
         file: selectedFile,
-        id: `${selectedFile.name}-${Date.now()}-${Math.random()}`
+        id: `${selectedFile.name}-${Date.now()}-${Math.random()}`,
       };
       setFile(fileItem);
       loadFile(selectedFile);
@@ -210,11 +232,11 @@ export default function PreviewPage() {
     e.preventDefault();
     const droppedFiles = Array.from(e.dataTransfer.files);
     const binFile = droppedFiles.find(file => file.name.endsWith('.bin'));
-    
+
     if (binFile) {
       const fileItem: FileItem = {
         file: binFile,
-        id: `${binFile.name}-${Date.now()}-${Math.random()}`
+        id: `${binFile.name}-${Date.now()}-${Math.random()}`,
       };
       setFile(fileItem);
       loadFile(binFile);
@@ -236,21 +258,18 @@ export default function PreviewPage() {
     <div className="min-h-screen bg-gradient-to-br from-blue-500 to-purple-600 flex flex-col">
       {/* Header */}
       <div className="bg-white shadow-lg p-6">
-        <h1 className="text-3xl font-bold text-center text-gray-800 mb-2">
-          Binary Model Preview
-        </h1>
-        <p className="text-center text-gray-600">
-          Drag and drop .bin files to preview 3D models
-        </p>
+        <h1 className="text-3xl font-bold text-center text-gray-800 mb-2">Binary Model Preview</h1>
+        <p className="text-center text-gray-600">Drag and drop .bin files to preview 3D models</p>
         <p className="text-center text-sm text-gray-500 mt-2">
-          Try the sample file: <code className="bg-gray-100 px-2 py-1 rounded">sample-with-materials.bin</code>
+          Try the sample file:{' '}
+          <code className="bg-gray-100 px-2 py-1 rounded">sample-with-materials.bin</code>
         </p>
       </div>
 
       <div className="flex-1 flex flex-col lg:flex-row">
         {/* File Upload Section */}
         <div className="lg:w-1/3 p-6">
-          <div 
+          <div
             ref={dropZoneRef}
             className="border-3 border-dashed border-gray-300 rounded-xl p-8 text-center cursor-pointer hover:border-blue-400 hover:bg-blue-50 transition-all duration-300 bg-white"
             onDrop={handleDrop}
@@ -260,9 +279,9 @@ export default function PreviewPage() {
             <div className="text-4xl mb-4">📁</div>
             <div className="text-lg text-gray-700 mb-2">Drop .bin file here or click to browse</div>
             <div className="text-sm text-gray-500">Single file preview only</div>
-            <input 
+            <input
               ref={fileInputRef}
-              type="file" 
+              type="file"
               accept=".bin"
               onChange={handleFileSelect}
               className="hidden"
@@ -274,27 +293,43 @@ export default function PreviewPage() {
             <div className="mt-6 bg-white rounded-lg p-4 shadow">
               <h3 className="font-semibold text-gray-800 mb-2">File Info</h3>
               <div className="space-y-2 text-sm">
-                <div><span className="font-medium">Name:</span> {file.file.name}</div>
-                <div><span className="font-medium">Size:</span> {formatFileSize(file.file.size)}</div>
+                <div>
+                  <span className="font-medium">Name:</span> {file.file.name}
+                </div>
+                <div>
+                  <span className="font-medium">Size:</span> {formatFileSize(file.file.size)}
+                </div>
                 {geometry?.userData && (
-                  <div><span className="font-medium">Data Size:</span> {formatFileSize(geometry.userData.originalDataSize || 0)}</div>
+                  <div>
+                    <span className="font-medium">Data Size:</span>{' '}
+                    {formatFileSize(geometry.userData.originalDataSize || 0)}
+                  </div>
                 )}
                 {materials && materials.length > 0 && (
                   <div>
-                    <div><span className="font-medium">Materials:</span> {materials.length}</div>
+                    <div>
+                      <span className="font-medium">Materials:</span> {materials.length}
+                    </div>
                     <div className="mt-2 space-y-1">
                       {materials.map((mat, index) => (
                         <div key={index} className="text-xs bg-gray-100 p-2 rounded">
                           <div className="flex items-center gap-2">
-                            <div 
+                            <div
                               className="w-4 h-4 rounded border"
-                              style={{ backgroundColor: `#${mat.color?.toString(16).padStart(6, '0')}` }}
+                              style={{
+                                backgroundColor: `#${mat.color?.toString(16).padStart(6, '0')}`,
+                              }}
                             ></div>
-                            <span className="font-medium">{mat.name || `Material ${index + 1}`}</span>
+                            <span className="font-medium">
+                              {mat.name || `Material ${index + 1}`}
+                            </span>
                           </div>
                           <div className="text-gray-600 mt-1">
-                            Roughness: {mat.roughness?.toFixed(2)}, Metalness: {mat.metalness?.toFixed(2)}
-                            {mat.transparent && <span className="ml-2 text-blue-600">Transparent</span>}
+                            Roughness: {mat.roughness?.toFixed(2)}, Metalness:{' '}
+                            {mat.metalness?.toFixed(2)}
+                            {mat.transparent && (
+                              <span className="ml-2 text-blue-600">Transparent</span>
+                            )}
                           </div>
                         </div>
                       ))}
@@ -302,7 +337,7 @@ export default function PreviewPage() {
                   </div>
                 )}
               </div>
-              <button 
+              <button
                 onClick={clearFile}
                 className="mt-4 bg-red-500 text-white px-4 py-2 rounded text-sm hover:bg-red-600 transition-colors"
               >
@@ -313,17 +348,22 @@ export default function PreviewPage() {
 
           {/* Status */}
           {status && (
-            <div className={`mt-6 p-4 rounded-lg ${
-              status.type === 'info' ? 'bg-blue-100 text-blue-800' :
-              status.type === 'success' ? 'bg-green-100 text-green-800' :
-              status.type === 'error' ? 'bg-red-100 text-red-800' :
-              'bg-orange-100 text-orange-800'
-            }`}>
+            <div
+              className={`mt-6 p-4 rounded-lg ${
+                status.type === 'info'
+                  ? 'bg-blue-100 text-blue-800'
+                  : status.type === 'success'
+                    ? 'bg-green-100 text-green-800'
+                    : status.type === 'error'
+                      ? 'bg-red-100 text-red-800'
+                      : 'bg-orange-100 text-orange-800'
+              }`}
+            >
               <div className="font-medium">{status.message}</div>
               {status.progress !== undefined && (
                 <div className="mt-2">
                   <div className="w-full bg-gray-200 rounded-full h-2">
-                    <div 
+                    <div
                       className="bg-blue-600 h-2 rounded-full transition-all duration-300"
                       style={{ width: `${status.progress}%` }}
                     ></div>
@@ -347,7 +387,7 @@ export default function PreviewPage() {
             ) : geometry ? (
               <Canvas camera={{ position: [3, 3, 3], fov: 50 }}>
                 <Scene geometry={geometry} materials={materials} />
-                <OrbitControls 
+                <OrbitControls
                   enablePan={true}
                   enableZoom={true}
                   enableRotate={true}
@@ -369,4 +409,4 @@ export default function PreviewPage() {
       </div>
     </div>
   );
-} 
+}

@@ -1,32 +1,32 @@
-"use client"
-import { useState } from 'react'
+'use client';
+import { useState } from 'react';
 
 interface GameState {
-  gameId: string
-  boardState: string
-  boardSize: number
-  komi: number
+  gameId: string;
+  boardState: string;
+  boardSize: number;
+  komi: number;
 }
 
 interface MoveResult {
-  move: { color: string; position: string }
-  boardState: string
-  nextMove: string
-  gameOver: boolean
-  score?: string
+  move: { color: string; position: string };
+  boardState: string;
+  nextMove: string;
+  gameOver: boolean;
+  score?: string;
 }
 
 export default function TestBackendPage() {
-  const [gameState, setGameState] = useState<GameState | null>(null)
-  const [moveResult, setMoveResult] = useState<MoveResult | null>(null)
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-  const [position, setPosition] = useState('')
-  const [color, setColor] = useState<'B' | 'W'>('B')
+  const [gameState, setGameState] = useState<GameState | null>(null);
+  const [moveResult, setMoveResult] = useState<MoveResult | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [position, setPosition] = useState('');
+  const [color, setColor] = useState<'B' | 'W'>('B');
 
   const createNewGame = async () => {
-    setLoading(true)
-    setError(null)
+    setLoading(true);
+    setError(null);
     try {
       const response = await fetch('/api/new_game', {
         method: 'POST',
@@ -35,33 +35,33 @@ export default function TestBackendPage() {
         },
         body: JSON.stringify({
           boardSize: 19,
-          komi: 7.5
-        })
-      })
+          komi: 7.5,
+        }),
+      });
 
-      const data = await response.json()
-      
+      const data = await response.json();
+
       if (data.success) {
-        setGameState(data.game)
-        setMoveResult(null)
+        setGameState(data.game);
+        setMoveResult(null);
       } else {
-        setError(data.error || 'Failed to create new game')
+        setError(data.error || 'Failed to create new game');
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Unknown error')
+      setError(err instanceof Error ? err.message : 'Unknown error');
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   const makeMove = async () => {
     if (!gameState || !position) {
-      setError('Please create a game first and enter a position')
-      return
+      setError('Please create a game first and enter a position');
+      return;
     }
 
-    setLoading(true)
-    setError(null)
+    setLoading(true);
+    setError(null);
     try {
       const response = await fetch('/api/game_move', {
         method: 'POST',
@@ -71,30 +71,30 @@ export default function TestBackendPage() {
         body: JSON.stringify({
           gameId: gameState.gameId,
           color,
-          position
-        })
-      })
+          position,
+        }),
+      });
 
-      const data = await response.json()
-      
+      const data = await response.json();
+
       if (data.success) {
-        setMoveResult(data.move)
-        setGameState(prev => prev ? { ...prev, boardState: data.move.boardState } : null)
-        setPosition('')
+        setMoveResult(data.move);
+        setGameState(prev => (prev ? { ...prev, boardState: data.move.boardState } : null));
+        setPosition('');
       } else {
-        setError(data.error || 'Failed to make move')
+        setError(data.error || 'Failed to make move');
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Unknown error')
+      setError(err instanceof Error ? err.message : 'Unknown error');
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   return (
     <div className="p-8 max-w-4xl mx-auto">
       <h1 className="text-3xl font-bold mb-8">KataGo API Test</h1>
-      
+
       <div className="space-y-6">
         {/* New Game Section */}
         <div className="bg-gray-100 p-6 rounded-lg">
@@ -139,7 +139,7 @@ export default function TestBackendPage() {
                 <label className="block text-sm font-medium mb-1">Color:</label>
                 <select
                   value={color}
-                  onChange={(e) => setColor(e.target.value as 'B' | 'W')}
+                  onChange={e => setColor(e.target.value as 'B' | 'W')}
                   className="border rounded px-3 py-2"
                 >
                   <option value="B">Black</option>
@@ -151,7 +151,7 @@ export default function TestBackendPage() {
                 <input
                   type="text"
                   value={position}
-                  onChange={(e) => setPosition(e.target.value.toUpperCase())}
+                  onChange={e => setPosition(e.target.value.toUpperCase())}
                   placeholder="e.g., A1, T19"
                   className="border rounded px-3 py-2 w-24"
                 />
@@ -203,5 +203,5 @@ export default function TestBackendPage() {
         )}
       </div>
     </div>
-  )
-} 
+  );
+}

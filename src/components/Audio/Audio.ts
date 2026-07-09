@@ -1,34 +1,33 @@
-"use client"
+'use client';
 
-import EventEmitter from "events";
+import EventEmitter from 'events';
 
 interface IPlay {
-  name : string;
+  name: string;
   buffer?: AudioBuffer | null;
-  when? : number;
-  offset? : number;
-  duration? : number;
-  volume? : number;
+  when?: number;
+  offset?: number;
+  duration?: number;
+  volume?: number;
   loop?: boolean;
-  override? : boolean;
+  override?: boolean;
 }
 
 interface IUserPlay {
   name: string;
-  when? : number;
-  offset? : number;
-  duration? : number;
-  volume? : number;
+  when?: number;
+  offset?: number;
+  duration?: number;
+  volume?: number;
   loop?: boolean;
 }
 
 export default class Audio {
-
-  static initialized = false
-  static enabled = true
+  static initialized = false;
+  static enabled = true;
 
   // 缓存正在加载的文件列表
-  static audiosLoading = new Set<string>()
+  static audiosLoading = new Set<string>();
   // 音乐buffer
   static audios = new Map<string, AudioBuffer>();
   // 待播放列表
@@ -49,85 +48,93 @@ export default class Audio {
   }
 
   static init() {
-    if(this.initialized){
-      return
+    if (this.initialized) {
+      return;
     }
 
     if (typeof window !== 'undefined' && typeof document !== 'undefined') {
-      this.unlock()
+      this.unlock();
     }
 
-    this.initialized = true
+    this.initialized = true;
   }
 
-  static unlock () {
+  static unlock() {
     if (typeof document === 'undefined') return;
 
-    const unlockWebAudio =  () => {
-      if (this.context.state !== "running") {
+    const unlockWebAudio = () => {
+      if (this.context.state !== 'running') {
         this.context.resume();
       }
-      document.body.removeEventListener("click", unlockWebAudio, true);
+      document.body.removeEventListener('click', unlockWebAudio, true);
     };
 
     // unlock webaudio autoplay policy
-    document.body.addEventListener("click", unlockWebAudio, true);
+    document.body.addEventListener('click', unlockWebAudio, true);
   }
 
   // 加载播放列表
-  static loadEffects (map : Map<string, string>) {
+  static loadEffects(map: Map<string, string>) {
     map.forEach((value, key) => {
-      this.loadEffect(key, value)
-    })
+      this.loadEffect(key, value);
+    });
   }
 
-  static async loadEffect (key: string, path: string){
+  static async loadEffect(key: string, path: string) {
     // 已存在
-    if(this.audios.get(key) || this.audiosLoading.has(key)){
-      return
+    if (this.audios.get(key) || this.audiosLoading.has(key)) {
+      return;
     }
-    this.audiosLoading.add(key)
+    this.audiosLoading.add(key);
 
     const effectRes = await fetch(path);
     const effectBuffer = await effectRes.arrayBuffer();
 
-    this.context.decodeAudioData(effectBuffer, data => {
-      this.audiosLoading.delete(key)
-      this.audios.set(key, data);
+    this.context.decodeAudioData(
+      effectBuffer,
+      data => {
+        this.audiosLoading.delete(key);
+        this.audios.set(key, data);
 
-      if(this.events.has(key)){
-        this.emitter.emit(key)
-        this.events.delete(key)
-        this.emitter.removeAllListeners(key)
+        if (this.events.has(key)) {
+          this.emitter.emit(key);
+          this.events.delete(key);
+          this.emitter.removeAllListeners(key);
+        }
+      },
+      e => {
+        // reject(e);
       }
-
-    }, e => {
-      // reject(e);
-    });
+    );
   }
 
   /**
    *  设置声音可用
    */
-  static enable () {
-    this.enabled = true
+  static enable() {
+    this.enabled = true;
   }
 
-  static disable(){
-    this.enabled = false
+  static disable() {
+    this.enabled = false;
   }
 
   /**
    *  播放声音
    * @param {String} name 文件名称
    */
-  static play (name: string, when = 0, offset = 0, duration? : number, volume = 0.5) {
-    if(!this.enabled){
-      return
+  static play(name: string, when = 0, offset = 0, duration?: number, volume = 0.5) {
+    if (!this.enabled) {
+      return;
     }
     if (this.audios.has(name)) {
       this.doPlay({
-        buffer: this.audios.get(name), name, when, offset, duration, volume
+        buffer: this.audios.get(name),
+        name,
+        when,
+        offset,
+        duration,
+        volume,
       });
     }
   }
@@ -135,16 +142,30 @@ export default class Audio {
   /**
    *  播放音效（默认音量 0.1）
    */
-  static playEffect (name: string, when? : number, offset? : number, duration? : number, volume? : number) {
-    this.play(name, when, offset, duration, volume || 0.2)
+  static playEffect(
+    name: string,
+    when?: number,
+    offset?: number,
+    duration?: number,
+    volume?: number
+  ) {
+    this.play(name, when, offset, duration, volume || 0.2);
   }
 
-  static doPlay ({buffer = null, name, when, offset, duration, volume, loop = false, override = true} : IPlay) {
-
-    if(override && this.audiosPlaying.has(name)){
-      const sourceNode = this.audiosPlaying.get(name)
-      if(sourceNode){
-        this.stop(sourceNode)
+  static doPlay({
+    buffer = null,
+    name,
+    when,
+    offset,
+    duration,
+    volume,
+    loop = false,
+    override = true,
+  }: IPlay) {
+    if (override && this.audiosPlaying.has(name)) {
+      const sourceNode = this.audiosPlaying.get(name);
+      if (sourceNode) {
+        this.stop(sourceNode);
       }
     }
     // 调整播放音量
@@ -159,67 +180,65 @@ export default class Audio {
     sourceNode.loop = loop || false;
     sourceNode.connect(gainNode);
 
-    this.audiosPlaying.set(name, sourceNode)
+    this.audiosPlaying.set(name, sourceNode);
 
     sourceNode.start(when, offset, duration);
     sourceNode.onended = () => {
       // 结束播放，清除
-      this.stopByName(name)
+      this.stopByName(name);
     };
-    return sourceNode
+    return sourceNode;
   }
 
-  static playAsnyc (cfg: IUserPlay, cb?: (audio: AudioBufferSourceNode) => void){
-    if(!this.enabled){
-      return
+  static playAsnyc(cfg: IUserPlay, cb?: (audio: AudioBufferSourceNode) => void) {
+    if (!this.enabled) {
+      return;
     }
     if (this.audios.has(cfg.name)) {
-      const audio = this.doPlay({...cfg, buffer:this.audios.get(cfg.name)})
-      if (cb) cb(audio)
-    } else if(this.audiosLoading.has(cfg.name)) {
-
+      const audio = this.doPlay({ ...cfg, buffer: this.audios.get(cfg.name) });
+      if (cb) cb(audio);
+    } else if (this.audiosLoading.has(cfg.name)) {
       const event = () => {
-        const audio = this.doPlay({...cfg, buffer:this.audios.get(cfg.name)})
-        if (cb) cb(audio)
-      }
-      this.events.set(cfg.name, event)
-      this.emitter.once(cfg.name , event)
+        const audio = this.doPlay({ ...cfg, buffer: this.audios.get(cfg.name) });
+        if (cb) cb(audio);
+      };
+      this.events.set(cfg.name, event);
+      this.emitter.once(cfg.name, event);
     }
   }
 
-  static stop (sourceNode: AudioBufferSourceNode) {
-    if(sourceNode){
-      try{
+  static stop(sourceNode: AudioBufferSourceNode) {
+    if (sourceNode) {
+      try {
         sourceNode.stop();
         sourceNode.disconnect();
-      }catch(e){
-      }
+      } catch (e) {}
     }
   }
 
-  static stopByName (key: string) {
-    if(this.audiosPlaying.has(key)){
-      const sourceNode = this.audiosPlaying.get(key)
-      if(sourceNode){
-        this.stop(sourceNode)
+  static stopByName(key: string) {
+    if (this.audiosPlaying.has(key)) {
+      const sourceNode = this.audiosPlaying.get(key);
+      if (sourceNode) {
+        this.stop(sourceNode);
       }
-      this.audiosPlaying.delete(key)
+      this.audiosPlaying.delete(key);
     }
   }
 
-  static remove (key: string){
-    this.stopByName(key)
+  static remove(key: string) {
+    this.stopByName(key);
 
-    if(this.audios.has(key)){
-      this.audios.delete(key)
+    if (this.audios.has(key)) {
+      this.audios.delete(key);
     }
-    if(this.events.has(key)) {
-      this.events.delete(key)
-      this.emitter.removeAllListeners(key)
+    if (this.events.has(key)) {
+      this.events.delete(key);
+      this.emitter.removeAllListeners(key);
     }
 
-    if(this.audiosLoading.has(key)){
-      this.audiosLoading.delete(key)
+    if (this.audiosLoading.has(key)) {
+      this.audiosLoading.delete(key);
     }
   }
 }

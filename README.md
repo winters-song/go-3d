@@ -12,10 +12,10 @@
 
 ## 在线体验
 
-| | |
-|---|---|
-| **Live Demo** | [https://go-3d-three.vercel.app/](https://go-3d-three.vercel.app/) |
-| **演示录屏** | 建议补充 30s GIF（落子 → 棋谱回放 → 视角切换），可放在 `docs/demo.gif` |
+|               |                                                                        |
+| ------------- | ---------------------------------------------------------------------- |
+| **Live Demo** | [https://go-3d-three.vercel.app/](https://go-3d-three.vercel.app/)     |
+| **演示录屏**  | 建议补充 30s GIF（落子 → 棋谱回放 → 视角切换），可放在 `docs/demo.gif` |
 
 > 本地运行：`yarn install && yarn dev`，访问 [http://localhost:3000](http://localhost:3000)
 
@@ -27,13 +27,13 @@
 
 ## 技术亮点
 
-| 亮点 | 说明 |
-|------|------|
+| 亮点         | 说明                                                              |
+| ------------ | ----------------------------------------------------------------- |
 | **按需渲染** | `frameloop="demand"`，静止时不占 GPU；交互与动画时 `invalidate()` |
-| **模型压缩** | 和室 GLB Draco 压缩至 ~8.9 MB，配合 `Preload` 预加载 |
-| **围棋引擎** | 自研 19 路规则（提子、禁入点、打劫），含单元测试 |
-| **3D 交互** | R3F + 射线检测落子、虚影预览、OrbitControls 与棋盘事件隔离 |
-| **现代栈** | Next.js 15 · React 19 · R3F · Redux Toolkit · Tailwind CSS 4 |
+| **模型压缩** | 和室 GLB Draco 压缩至 ~8.9 MB，配合 `Preload` 预加载              |
+| **围棋引擎** | 自研 19 路规则（提子、禁入点、打劫），含单元测试                  |
+| **3D 交互**  | R3F + 射线检测落子、虚影预览、OrbitControls 与棋盘事件隔离        |
+| **现代栈**   | Next.js 15 · React 19 · R3F · Redux Toolkit · Tailwind CSS 4      |
 
 ## 技术栈
 
@@ -104,10 +104,10 @@ Live Demo 已部署于 [https://go-3d-three.vercel.app/](https://go-3d-three.ver
 <details>
 <summary>其他路由与扩展能力</summary>
 
-| 路径 | 说明 |
-|------|------|
-| `/company` | 会议室场景 |
-| `/sunset` | 日落户外场景 |
+| 路径       | 说明                    |
+| ---------- | ----------------------- |
+| `/company` | 会议室场景              |
+| `/sunset`  | 日落户外场景            |
 | `/backend` | iframe postMessage 通信 |
 
 KataGo 集成、API 路由等见 [API_DOCUMENTATION.md](./API_DOCUMENTATION.md)。

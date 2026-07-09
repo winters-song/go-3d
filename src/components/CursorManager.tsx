@@ -1,8 +1,8 @@
-import { useRef, useEffect } from 'react'
-import { OrbitControls } from '@react-three/drei'
-import type { OrbitControls as OrbitControlsImpl } from 'three-stdlib'
-import { useAppSelector } from '@/store/hooks'
-import { useCameraControls } from '@/hooks/useCameraControls'
+import { useRef, useEffect } from 'react';
+import { OrbitControls } from '@react-three/drei';
+import type { OrbitControls as OrbitControlsImpl } from 'three-stdlib';
+import { useAppSelector } from '@/store/hooks';
+import { useCameraControls } from '@/hooks/useCameraControls';
 
 // Create a global event emitter for camera controls
 const cameraEvents = {
@@ -13,7 +13,7 @@ const cameraEvents = {
   subscribe(listener: () => void) {
     this.listeners.add(listener);
     return () => this.listeners.delete(listener);
-  }
+  },
 };
 
 export function useCameraTopView() {
@@ -22,7 +22,7 @@ export function useCameraTopView() {
 
 export default function CursorManager() {
   const controlsRef = useRef<OrbitControlsImpl>(null);
-  const isCameraLocked = useAppSelector((state) => state.camera.isLocked);
+  const isCameraLocked = useAppSelector(state => state.camera.isLocked);
   const { handleCameraTopView } = useCameraControls(controlsRef);
 
   useEffect(() => {
@@ -56,5 +56,5 @@ export default function CursorManager() {
         enabled={!isCameraLocked}
       />
     </>
-  )
-} 
+  );
+}

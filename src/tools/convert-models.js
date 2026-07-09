@@ -22,14 +22,14 @@ const modelConverterPath = path.join(__dirname, 'model-converter.ts');
 const child = spawn(tsNodePath, ['--esm', modelConverterPath, ...args], {
   stdio: 'inherit',
   cwd: process.cwd(),
-  env: { ...process.env, NODE_OPTIONS: '--loader ts-node/esm' }
+  env: { ...process.env, NODE_OPTIONS: '--loader ts-node/esm' },
 });
 
-child.on('close', (code) => {
+child.on('close', code => {
   process.exit(code);
 });
 
-child.on('error', (error) => {
+child.on('error', error => {
   console.error('Failed to start converter:', error);
   process.exit(1);
-}); 
+});

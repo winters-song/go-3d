@@ -1,32 +1,32 @@
-'use client'
+'use client';
 
-import { useEffect, useState } from 'react'
-import { useSceneEntry } from '@/contexts/SceneEntryContext'
+import { useEffect, useState } from 'react';
+import { useSceneEntry } from '@/contexts/SceneEntryContext';
 
 const OVERLAY_BG =
-  'radial-gradient(ellipse at 30% 20%, rgba(88, 72, 48, 0.35) 0%, transparent 55%), radial-gradient(ellipse at 70% 80%, rgba(40, 60, 40, 0.25) 0%, transparent 50%), linear-gradient(165deg, #14110e 0%, #1c1814 45%, #121510 100%)'
+  'radial-gradient(ellipse at 30% 20%, rgba(88, 72, 48, 0.35) 0%, transparent 55%), radial-gradient(ellipse at 70% 80%, rgba(40, 60, 40, 0.25) 0%, transparent 50%), linear-gradient(165deg, #14110e 0%, #1c1814 45%, #121510 100%)';
 
 export default function SceneEntryOverlay() {
-  const { phase, progress, enterScene } = useSceneEntry()
-  const [fading, setFading] = useState(false)
-  const pct = Math.min(100, Math.round(progress))
-  const visible = phase !== 'done'
+  const { phase, progress, enterScene } = useSceneEntry();
+  const [fading, setFading] = useState(false);
+  const pct = Math.min(100, Math.round(progress));
+  const visible = phase !== 'done';
 
   useEffect(() => {
-    document.body.classList.toggle('scene-entry-active', visible)
-    return () => document.body.classList.remove('scene-entry-active')
-  }, [visible])
+    document.body.classList.toggle('scene-entry-active', visible);
+    return () => document.body.classList.remove('scene-entry-active');
+  }, [visible]);
 
   useEffect(() => {
     if (phase !== 'intro') {
-      setFading(false)
-      return
+      setFading(false);
+      return;
     }
-    const frame = requestAnimationFrame(() => setFading(true))
-    return () => cancelAnimationFrame(frame)
-  }, [phase])
+    const frame = requestAnimationFrame(() => setFading(true));
+    return () => cancelAnimationFrame(frame);
+  }, [phase]);
 
-  if (!visible) return null
+  if (!visible) return null;
 
   return (
     <div
@@ -43,25 +43,18 @@ export default function SceneEntryOverlay() {
           {phase === 'loading' ? (
             <>
               <div className="scene-entry-overlay__bar" aria-hidden="true">
-                <div
-                  className="scene-entry-overlay__bar-fill"
-                  style={{ width: `${pct}%` }}
-                />
+                <div className="scene-entry-overlay__bar-fill" style={{ width: `${pct}%` }} />
               </div>
               <p className="scene-entry-overlay__progress">加载场景 {pct}%</p>
               <p className="scene-entry-overlay__hint">榻榻米 · 庭园 HDR · Draco 模型</p>
             </>
           ) : (
-            <button
-              type="button"
-              className="scene-entry-overlay__start"
-              onClick={enterScene}
-            >
+            <button type="button" className="scene-entry-overlay__start" onClick={enterScene}>
               开始体验
             </button>
           )}
         </div>
       )}
     </div>
-  )
+  );
 }

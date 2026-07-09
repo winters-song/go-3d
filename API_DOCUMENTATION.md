@@ -17,6 +17,7 @@ This document describes the Next.js API routes for integrating with KataGo GTP s
 **Description**: Creates a new Go game session with KataGo AI
 
 **Request Body**:
+
 ```json
 {
   "boardSize": 19,
@@ -25,10 +26,12 @@ This document describes the Next.js API routes for integrating with KataGo GTP s
 ```
 
 **Parameters**:
+
 - `boardSize` (optional): Board size (default: 19)
 - `komi` (optional): Komi value (default: 7.5)
 
 **Response**:
+
 ```json
 {
   "success": true,
@@ -48,6 +51,7 @@ This document describes the Next.js API routes for integrating with KataGo GTP s
 **Description**: Makes a move in an active game and gets AI response
 
 **Request Body**:
+
 ```json
 {
   "gameId": "1703123456789",
@@ -57,11 +61,13 @@ This document describes the Next.js API routes for integrating with KataGo GTP s
 ```
 
 **Parameters**:
+
 - `gameId` (required): Game ID from new_game response
 - `color` (required): Player color ("B" for Black, "W" for White)
 - `position` (required): Move position in Go notation (e.g., "A1", "T19")
 
 **Response**:
+
 ```json
 {
   "success": true,
@@ -78,6 +84,7 @@ This document describes the Next.js API routes for integrating with KataGo GTP s
 ```
 
 **Game Over Response**:
+
 ```json
 {
   "success": true,
@@ -104,35 +111,35 @@ const createGame = async () => {
   const response = await fetch('/api/new_game', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ boardSize: 19, komi: 7.5 })
-  })
-  const data = await response.json()
-  return data.game
-}
+    body: JSON.stringify({ boardSize: 19, komi: 7.5 }),
+  });
+  const data = await response.json();
+  return data.game;
+};
 
 // Make a move
 const makeMove = async (gameId: string, color: 'B' | 'W', position: string) => {
   const response = await fetch('/api/game_move', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ gameId, color, position })
-  })
-  const data = await response.json()
-  return data.move
-}
+    body: JSON.stringify({ gameId, color, position }),
+  });
+  const data = await response.json();
+  return data.move;
+};
 
 // Example usage
 const playGame = async () => {
   // Create new game
-  const game = await createGame()
-  console.log('Game created:', game.gameId)
-  
+  const game = await createGame();
+  console.log('Game created:', game.gameId);
+
   // Make first move
-  const moveResult = await makeMove(game.gameId, 'B', 'A1')
-  console.log('AI response:', moveResult.nextMove)
-  
+  const moveResult = await makeMove(game.gameId, 'B', 'A1');
+  console.log('AI response:', moveResult.nextMove);
+
   // Continue playing...
-}
+};
 ```
 
 ### cURL Examples
@@ -161,6 +168,7 @@ All API endpoints return consistent error responses:
 ```
 
 **Common Error Codes**:
+
 - `400`: Bad Request (invalid parameters)
 - `404`: Game not found
 - `500`: Internal Server Error (KataGo issues)
@@ -168,6 +176,7 @@ All API endpoints return consistent error responses:
 ## Coordinate System
 
 The API uses standard Go notation:
+
 - Columns: A-T (skipping I)
 - Rows: 1-19 (for 19x19 board)
 - Examples: A1, T19, K10
@@ -177,19 +186,19 @@ The API uses standard Go notation:
 The project includes utility functions in `src/utils/goUtils.ts`:
 
 ```typescript
-import { coordsToIndex, indexToCoords, isValidPosition, isValidColor } from '@/utils/goUtils'
+import { coordsToIndex, indexToCoords, isValidPosition, isValidColor } from '@/utils/goUtils';
 
 // Convert coordinates to array indices
-const indices = coordsToIndex('A1', 19) // [0, 18]
+const indices = coordsToIndex('A1', 19); // [0, 18]
 
 // Convert array indices to coordinates
-const coords = indexToCoords(0, 18, 19) // "A1"
+const coords = indexToCoords(0, 18, 19); // "A1"
 
 // Validate position format
-const isValid = isValidPosition('A1') // true
+const isValid = isValidPosition('A1'); // true
 
 // Validate color
-const isValidColor = isValidColor('B') // true
+const isValidColor = isValidColor('B'); // true
 ```
 
 ## Testing
@@ -201,4 +210,4 @@ Visit `/test-backend` in your application to test the API endpoints with a user 
 - Games are stored in memory and will be lost on server restart
 - For production, implement proper database storage
 - KataGo processes are managed per game session
-- The API automatically handles AI responses after each move 
+- The API automatically handles AI responses after each move

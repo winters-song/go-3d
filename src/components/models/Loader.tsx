@@ -1,8 +1,8 @@
-import { useProgress, Html } from "@react-three/drei"
+import { useProgress, Html } from '@react-three/drei';
 
 export default function Loader() {
-  const { progress } = useProgress()
-  const pct = Math.min(100, Math.round(progress))
+  const { progress } = useProgress();
+  const pct = Math.min(100, Math.round(progress));
 
   return (
     <Html fullscreen>
@@ -21,5 +21,5 @@ export default function Loader() {
         加载中 {pct}%
       </div>
     </Html>
-  )
+  );
 }

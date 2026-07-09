@@ -1,12 +1,12 @@
-import * as THREE from 'three'
-import { useRef } from 'react'
-import { useHelper } from '@react-three/drei'
+import * as THREE from 'three';
+import { useRef } from 'react';
+import { useHelper } from '@react-three/drei';
 
 export default function Lights() {
-  const light1 = useRef<THREE.DirectionalLight>(null!)
-  const light2 = useRef<THREE.DirectionalLight>(null!)
-  const light3 = useRef<THREE.DirectionalLight>(null!)
-  
+  const light1 = useRef<THREE.DirectionalLight>(null!);
+  const light2 = useRef<THREE.DirectionalLight>(null!);
+  const light3 = useRef<THREE.DirectionalLight>(null!);
+
   // useHelper(light1, THREE.DirectionalLightHelper, 1, 'red')
   // useHelper(light2, THREE.DirectionalLightHelper, 1, 'green')
   // useHelper(light3, THREE.DirectionalLightHelper, 1, 'blue')
@@ -14,11 +14,11 @@ export default function Lights() {
   return (
     <>
       <ambientLight intensity={0.8} />
-      <directionalLight 
+      <directionalLight
         ref={light1}
-        position={[10, 5, 0]} 
-        intensity={3} 
-        castShadow 
+        position={[10, 5, 0]}
+        intensity={3}
+        castShadow
         shadow-mapSize={[2048, 2048]}
         shadow-camera-left={-20}
         shadow-camera-right={20}
@@ -40,5 +40,5 @@ export default function Lights() {
         color={'#ffffff'}
       /> */}
     </>
-  )
-} 
+  );
+}

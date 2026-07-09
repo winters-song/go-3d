@@ -1,11 +1,11 @@
-'use client'
+'use client';
 
-import { useEffect } from 'react'
-import { CloseIcon } from './icons'
+import { useEffect } from 'react';
+import { CloseIcon } from './icons';
 
 interface PageInfoModalProps {
-  open: boolean
-  onClose: () => void
+  open: boolean;
+  onClose: () => void;
 }
 
 const FEATURES = [
@@ -14,20 +14,20 @@ const FEATURES = [
   '棋谱浏览：底部控制栏支持逐步前进、后退与跳转',
   '文件操作：新建棋局或导入 SGF 棋谱文件',
   '视角控制：锁定/解锁相机、俯视视角与全屏模式',
-]
+];
 
 export default function PageInfoModal({ open, onClose }: PageInfoModalProps) {
   useEffect(() => {
-    if (!open) return
+    if (!open) return;
 
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose()
-    }
-    document.addEventListener('keydown', handleKeyDown)
-    return () => document.removeEventListener('keydown', handleKeyDown)
-  }, [open, onClose])
+      if (e.key === 'Escape') onClose();
+    };
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [open, onClose]);
 
-  if (!open) return null
+  if (!open) return null;
 
   return (
     <div
@@ -57,7 +57,10 @@ export default function PageInfoModal({ open, onClose }: PageInfoModalProps) {
           <p className="mb-1 text-xs tracking-[0.35em] uppercase text-neutral-400">
             Washitsu · 和室
           </p>
-          <h2 id="page-info-title" className="mb-3 text-2xl font-light tracking-wide text-neutral-900">
+          <h2
+            id="page-info-title"
+            className="mb-3 text-2xl font-light tracking-wide text-neutral-900"
+          >
             Go 3D
           </h2>
         </div>
@@ -70,7 +73,7 @@ export default function PageInfoModal({ open, onClose }: PageInfoModalProps) {
           功能简介
         </h3>
         <ul className="space-y-2.5 text-sm leading-relaxed text-neutral-600">
-          {FEATURES.map((feature) => (
+          {FEATURES.map(feature => (
             <li key={feature} className="flex gap-2">
               <span className="mt-2 h-1 w-1 shrink-0 rounded-full bg-neutral-400" />
               <span>{feature}</span>
@@ -79,5 +82,5 @@ export default function PageInfoModal({ open, onClose }: PageInfoModalProps) {
         </ul>
       </div>
     </div>
-  )
+  );
 }

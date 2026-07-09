@@ -64,6 +64,7 @@ node src/tools/convert-models.js src/tools/models
 ## How it works
 
 ### Basic Converter
+
 The basic converter follows the same logic as `CustomDRACOLoader`:
 
 1. **Reads the binary file** and extracts metadata from the first 10 bytes
@@ -72,6 +73,7 @@ The basic converter follows the same logic as `CustomDRACOLoader`:
 4. **Exports to GLB** format (structure only)
 
 ### Full Geometry Converter
+
 The full geometry converter provides complete conversion:
 
 1. **Reads the binary file** and extracts metadata from the first 10 bytes
@@ -83,6 +85,7 @@ The full geometry converter provides complete conversion:
 ## File Format
 
 The binary files are expected to have this structure:
+
 - **Bytes 0-9**: Metadata length (as string)
 - **Bytes 10-10+metadataLength**: JSON metadata containing attribute definitions
 - **Remaining bytes**: Compressed geometry data (Draco format)
@@ -96,6 +99,7 @@ The binary files are expected to have this structure:
 ## Error Handling
 
 The tool provides detailed error messages for:
+
 - Invalid file formats
 - Missing files or directories
 - DRACO decoding errors
@@ -104,6 +108,7 @@ The tool provides detailed error messages for:
 ## Example
 
 ### Basic Conversion
+
 ```bash
 # Convert the terrain model (structure only)
 npm run convert-models src/tools/models/terrain.bin
@@ -113,6 +118,7 @@ npm run convert-models src/tools/models
 ```
 
 ### Full Geometry Conversion
+
 ```bash
 # Convert with full geometry (opens browser)
 npm run convert-models-full src/tools/models/terrain.bin
@@ -122,6 +128,7 @@ npm run convert-models-full src/tools/models
 ```
 
 This will create:
+
 - **Basic**: `terrain.glb` (structure only)
 - **Full**: `terrain.glb` (complete geometry with mesh data)
-- **Batch**: `glb-exports/terrain.glb` and `glb-exports/kid.glb` 
+- **Batch**: `glb-exports/terrain.glb` and `glb-exports/kid.glb`

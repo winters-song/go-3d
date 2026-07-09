@@ -1,7 +1,7 @@
-import { useState, useRef, useEffect, useCallback } from "react";
-import { MusicNoteIcon, MusicNoteOffIcon } from "./ui/icons";
-import Tooltip from "./ui/Tooltip";
-import { useSceneEntry } from "@/contexts/SceneEntryContext";
+import { useState, useRef, useEffect, useCallback } from 'react';
+import { MusicNoteIcon, MusicNoteOffIcon } from './ui/icons';
+import Tooltip from './ui/Tooltip';
+import { useSceneEntry } from '@/contexts/SceneEntryContext';
 
 // Music toggle button component
 export default function MusicToggle() {
@@ -23,9 +23,12 @@ export default function MusicToggle() {
         ensureAudio().load();
       },
       play: () => {
-        ensureAudio().play().then(() => setPlaying(true)).catch((err) => {
-          console.warn('Play prevented:', err);
-        });
+        ensureAudio()
+          .play()
+          .then(() => setPlaying(true))
+          .catch(err => {
+            console.warn('Play prevented:', err);
+          });
       },
     });
   }, [registerMusicHandlers, ensureAudio]);
@@ -54,14 +57,18 @@ export default function MusicToggle() {
   };
 
   return (
-    <Tooltip label={playing ? "Pause music" : "Play music"}>
-      <button 
+    <Tooltip label={playing ? 'Pause music' : 'Play music'}>
+      <button
         onClick={toggleMusic}
         className="bg-black/30 backdrop-blur-sm p-2 rounded-full hover:bg-black/50 transition-colors cursor-pointer"
-        aria-label={playing ? "Pause music" : "Play music"}
+        aria-label={playing ? 'Pause music' : 'Play music'}
       >
-        <div className={playing ? "animate-[spin_6s_linear_infinite]" : ""}>
-          {playing ? <MusicNoteOffIcon className="text-white" /> : <MusicNoteIcon className="text-white" />}
+        <div className={playing ? 'animate-[spin_6s_linear_infinite]' : ''}>
+          {playing ? (
+            <MusicNoteOffIcon className="text-white" />
+          ) : (
+            <MusicNoteIcon className="text-white" />
+          )}
         </div>
       </button>
     </Tooltip>

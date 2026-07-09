@@ -19,4 +19,4 @@ const cameraSlice = createSlice({
 });
 
 export const { setCameraLock } = cameraSlice.actions;
-export default cameraSlice.reducer; 
+export default cameraSlice.reducer;

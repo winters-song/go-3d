@@ -7,15 +7,20 @@ interface NavigationButtonProps {
 
 const NavigationButton: React.FC<NavigationButtonProps> = ({ onClick, path }) => {
   return (
-    <button 
+    <button
       className="p-2 text-white opacity-80 hover:opacity-100 rounded-md transition-colors border-2 border-gray-200 cursor-pointer"
       onClick={onClick}
     >
-      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        className="h-5 w-5"
+        viewBox="0 0 20 20"
+        fill="currentColor"
+      >
         <path d={path} />
       </svg>
     </button>
   );
 };
 
-export default NavigationButton; 
+export default NavigationButton;

@@ -1,0 +1,12 @@
+node_modules
+.next
+out
+build
+dist
+coverage
+public/glb
+public/hdri
+public/draco
+*.lock
+yarn.lock
+package-lock.json
