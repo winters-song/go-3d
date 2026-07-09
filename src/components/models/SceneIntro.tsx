@@ -20,26 +20,21 @@ const INTRO_TO = {
 export default function SceneIntro() {
   const { controls } = useThree()
   const { animateCamera } = useCameraAnimation()
-  const { startIntroFade, finishIntro } = useSceneEntry()
+  const { phase, finishIntro } = useSceneEntry()
   const hasPlayed = useRef(false)
 
   useEffect(() => {
-    if (hasPlayed.current || !controls) return
+    if (hasPlayed.current || !controls || phase !== 'intro') return
     hasPlayed.current = true
 
-    const timer = window.setTimeout(() => {
-      startIntroFade()
-      animateCamera(
-        controls as OrbitControlsImpl,
-        INTRO_FROM,
-        INTRO_TO,
-        INTRO_DURATION,
-        finishIntro,
-      )
-    }, 400)
-
-    return () => window.clearTimeout(timer)
-  }, [controls, animateCamera, startIntroFade, finishIntro])
+    animateCamera(
+      controls as OrbitControlsImpl,
+      INTRO_FROM,
+      INTRO_TO,
+      INTRO_DURATION,
+      finishIntro,
+    )
+  }, [controls, phase, animateCamera, finishIntro])
 
   return null
 }

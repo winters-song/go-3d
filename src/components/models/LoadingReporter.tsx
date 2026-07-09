@@ -7,11 +7,14 @@ import { useSceneEntry } from '@/contexts/SceneEntryContext'
 /** Reports asset loading progress from inside the Canvas tree. */
 export default function LoadingReporter() {
   const { progress } = useProgress()
-  const { setProgress } = useSceneEntry()
+  const { setProgress, markReady } = useSceneEntry()
 
   useEffect(() => {
     setProgress(progress)
-  }, [progress, setProgress])
+    if (progress >= 100) {
+      markReady()
+    }
+  }, [progress, setProgress, markReady])
 
   return null
 }

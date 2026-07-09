@@ -1,33 +1,51 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { MusicNoteIcon, MusicNoteOffIcon } from "./ui/icons";
+import { useSceneEntry } from "@/contexts/SceneEntryContext";
 
 // Music toggle button component
 export default function MusicToggle() {
-  const [playing, setPlaying] = useState(false); // Start with audio not playing to avoid autoplay issues
+  const [playing, setPlaying] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const { registerMusicHandlers } = useSceneEntry();
+
+  const ensureAudio = useCallback(() => {
+    if (!audioRef.current) {
+      audioRef.current = new Audio('/music/rainy.m4a');
+      audioRef.current.loop = true;
+    }
+    return audioRef.current;
+  }, []);
 
   useEffect(() => {
-    // Setup cleanup function
+    registerMusicHandlers({
+      prime: () => {
+        ensureAudio().load();
+      },
+      play: () => {
+        ensureAudio().play().then(() => setPlaying(true)).catch((err) => {
+          console.warn('Play prevented:', err);
+        });
+      },
+    });
+  }, [registerMusicHandlers, ensureAudio]);
+
+  useEffect(() => {
     return () => {
       if (audioRef.current) {
         audioRef.current.pause();
-        audioRef.current.src = ''; // Clear source to release memory
+        audioRef.current.src = '';
         audioRef.current = null;
       }
     };
   }, []);
 
   const toggleMusic = () => {
-    // Create audio on first interaction if needed
-    if (!audioRef.current) {
-      audioRef.current = new Audio('/music/rainy.m4a');
-      audioRef.current.loop = true;
-    }
-    
+    const audio = ensureAudio();
+
     if (playing) {
-      audioRef.current.pause();
+      audio.pause();
     } else {
-      audioRef.current.play().catch(err => {
+      audio.play().catch(err => {
         console.warn('Play prevented:', err);
       });
     }

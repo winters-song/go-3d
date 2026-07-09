@@ -105,6 +105,29 @@ body.scene-entry-active {
   color: rgba(245, 240, 232, 0.4);
 }
 
+.scene-entry-overlay__start {
+  margin-top: 2rem;
+  padding: 0.75rem 2.5rem;
+  border: 1px solid rgba(212, 196, 168, 0.45);
+  border-radius: 999px;
+  background: rgba(139, 115, 85, 0.25);
+  color: #f5f0e8;
+  font-size: 1rem;
+  letter-spacing: 0.35em;
+  text-indent: 0.35em;
+  cursor: pointer;
+  transition: background 0.2s ease, border-color 0.2s ease, transform 0.15s ease;
+}
+
+.scene-entry-overlay__start:hover {
+  background: rgba(139, 115, 85, 0.45);
+  border-color: rgba(212, 196, 168, 0.7);
+}
+
+.scene-entry-overlay__start:active {
+  transform: scale(0.97);
+}
+
 @keyframes scene-entry-fade-in {
   from {
     opacity: 0;

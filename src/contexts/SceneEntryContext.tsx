@@ -1,15 +1,22 @@
 'use client'
 
-import { createContext, useCallback, useContext, useMemo, useState } from 'react'
+import { createContext, useCallback, useContext, useMemo, useRef, useState } from 'react'
 
-export type SceneEntryPhase = 'loading' | 'intro' | 'done'
+export type SceneEntryPhase = 'loading' | 'ready' | 'intro' | 'done'
+
+interface MusicHandlers {
+  prime: () => void
+  play: () => void
+}
 
 interface SceneEntryContextValue {
   phase: SceneEntryPhase
   progress: number
   setProgress: (progress: number) => void
-  startIntroFade: () => void
+  markReady: () => void
+  enterScene: () => void
   finishIntro: () => void
+  registerMusicHandlers: (handlers: MusicHandlers) => void
 }
 
 const SceneEntryContext = createContext<SceneEntryContextValue | null>(null)
@@ -17,13 +24,24 @@ const SceneEntryContext = createContext<SceneEntryContextValue | null>(null)
 export function SceneEntryProvider({ children }: { children: React.ReactNode }) {
   const [phase, setPhase] = useState<SceneEntryPhase>('loading')
   const [progress, setProgress] = useState(0)
+  const musicHandlersRef = useRef<MusicHandlers | null>(null)
 
-  const startIntroFade = useCallback(() => {
+  const markReady = useCallback(() => {
+    setPhase((current) => (current === 'loading' ? 'ready' : current))
+  }, [])
+
+  const enterScene = useCallback(() => {
+    musicHandlersRef.current?.prime()
     setPhase('intro')
   }, [])
 
   const finishIntro = useCallback(() => {
+    musicHandlersRef.current?.play()
     setPhase('done')
+  }, [])
+
+  const registerMusicHandlers = useCallback((handlers: MusicHandlers) => {
+    musicHandlersRef.current = handlers
   }, [])
 
   const value = useMemo(
@@ -31,10 +49,12 @@ export function SceneEntryProvider({ children }: { children: React.ReactNode }) 
       phase,
       progress,
       setProgress,
-      startIntroFade,
+      markReady,
+      enterScene,
       finishIntro,
+      registerMusicHandlers,
     }),
-    [phase, progress, startIntroFade, finishIntro],
+    [phase, progress, markReady, enterScene, finishIntro, registerMusicHandlers],
   )
 
   return (
