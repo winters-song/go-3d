@@ -3,8 +3,8 @@ import "./globals.css";
 import { Providers } from "./providers";
 
 export const metadata: Metadata = {
-  title: "Go 3D",
-  description: "3D Go board viewer",
+  title: "Go 3D — 沉浸式围棋三维场景",
+  description: "日式和室中的 3D 围棋对弈与棋谱回放",
 };
 
 export default function RootLayout({
@@ -13,7 +13,7 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en">
+    <html lang="zh-CN">
       <body className="font-inter">
         <Providers>
           {children}

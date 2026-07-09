@@ -3,16 +3,17 @@ import Board from "./Board";
 import GoboardPlayer from "../go/GoboardPlayer";
 import Goboard_3d from "../go/Goboard_3d";
 import Audio from  '../Audio/Audio'
+import { sgf } from '@/data/sgf'
 
 export default function GoboardPanel({ player }: { player: GoboardPlayer }) {
-  const [goboard] = useState(() => {
-    const newGoboard = new Goboard_3d({
-      
-    });
-    player.cb = newGoboard;
-    player.newSgf();
-    return newGoboard;
-  });
+  const [goboard] = useState(() => new Goboard_3d({}))
+
+  useEffect(() => {
+    if (player.cb === goboard) return
+    player.cb = goboard
+    player.loadSgf(sgf, 1)
+    player.toEnd()
+  }, [player, goboard])
 
   useEffect(() => {
     // Expose the print function to the global window

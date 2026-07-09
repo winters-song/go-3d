@@ -3,13 +3,15 @@ import * as THREE from 'three'
 import { Canvas } from '@react-three/fiber'
 import { useRef, Suspense, useEffect } from 'react'
 import { useGLTF, Preload, Stats, Environment } from "@react-three/drei"
-import Loader from '@/components/models/Loader'
 import Lights from '@/components/models/Lights'
 import GoboardPlayer from '@/components/go/GoboardPlayer'
 import BottomBar from '@/components/ui/BottomBar'
 import RightSidebar from '@/components/ui/RightSidebar'
 import GoboardPanel from '@/components/models/GoboardPanel'
 import CursorManager from '@/components/CursorManager'
+import SceneIntro from '@/components/models/SceneIntro'
+import LoadingReporter from '@/components/models/LoadingReporter'
+import SceneEntryOverlay from '@/components/ui/SceneEntryOverlay'
 
 function SceneContent() {
   const { scene: roomScene } = useGLTF('/glb/room-baked.draco.glb')
@@ -42,6 +44,7 @@ export default function Home() {
 
   return (
     <>
+      <SceneEntryOverlay />
       <RightSidebar player={player} />
 
       <Canvas
@@ -57,12 +60,14 @@ export default function Home() {
         }}
         frameloop="demand"
       >
-        <Suspense fallback={<Loader />}>
+        <Suspense fallback={<LoadingReporter />}>
+          <LoadingReporter />
           <Environment files='/hdri/forest_slope_1k.hdr' background={'only'} backgroundBlurriness={0.1} />
           <CursorManager />
           <Lights />
           <GoboardPanel player={player} />
           <SceneContent />
+          <SceneIntro />
           <Stats className="stats" />
         </Suspense>
         <Preload all />

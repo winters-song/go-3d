@@ -7,6 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "convert-models": "node src/tools/model-converter.js",
     "convert-models-full": "node src/tools/full-model-converter.js"
   },
@@ -33,6 +35,7 @@
     "eslint-config-next": "15.5.18",
     "tailwindcss": "^4",
     "ts-node": "^10.9.2",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vitest": "^3.2.4"
   }
 }

@@ -175,12 +175,12 @@ export default class Audio {
     }
     if (this.audios.has(cfg.name)) {
       const audio = this.doPlay({...cfg, buffer:this.audios.get(cfg.name)})
-      cb && cb(audio)
+      if (cb) cb(audio)
     } else if(this.audiosLoading.has(cfg.name)) {
 
       const event = () => {
         const audio = this.doPlay({...cfg, buffer:this.audios.get(cfg.name)})
-        cb && cb(audio)
+        if (cb) cb(audio)
       }
       this.events.set(cfg.name, event)
       this.emitter.once(cfg.name , event)

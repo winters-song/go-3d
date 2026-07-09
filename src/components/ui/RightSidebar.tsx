@@ -11,7 +11,6 @@ import {
 import { useAppDispatch, useAppSelector } from '@/store/hooks'
 import { setCameraLock } from '@/store/cameraSlice'
 import { useCameraTopView } from '@/components/CursorManager'
-import * as THREE from 'three'
 import GoboardPlayer from '../go/GoboardPlayer'
 
 interface RightSidebarProps {
@@ -50,17 +49,14 @@ export default function RightSidebar({ player }: RightSidebarProps) {
   };
 
   const handleNewFile = () => {
-    console.log('New file clicked');
     player.newSgf();
   };
 
   const handleOpenFile = () => {
-    console.log('Open file clicked');
-
     const upload = (file: Blob) => {
-      let fileReader = new FileReader();
-      fileReader.onload = e => {
-        let sgf = fileReader.result as string;
+      const fileReader = new FileReader();
+      fileReader.onload = () => {
+        const sgf = fileReader.result as string;
         player.changeData(sgf, 1)
         player.toEnd()
       };
