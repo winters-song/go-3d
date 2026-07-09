@@ -8,6 +8,7 @@ import Loader from '@/components/models/Loader'
 import Lights from '@/components/models/Lights'
 import PlayerAvatars from '@/components/models/PlayerAvatars'
 import Board from '@/components/models/Board'
+import Goboard_3d from '@/components/go/Goboard_3d'
 import Room from '@/components/models/Room'
 import SunLights from '@/components/models/SunLights'
 import GoBoard from '@/components/models/GoBoard'
@@ -157,7 +158,7 @@ function SceneContent() {
 
   return (
     <>
-      <Board player={player.current} />
+      <Board goboard={player.current as unknown as Goboard_3d} />
       <GoBoard />
       {/* <Environment files="/hdri/forest.jpg" background={'only'}  /> */}
       {/* <PlayerAvatars /> */}

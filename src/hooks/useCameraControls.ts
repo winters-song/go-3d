@@ -4,6 +4,8 @@ import type { OrbitControls as OrbitControlsImpl } from 'three-stdlib'
 import * as THREE from 'three'
 
 export function useCameraControls(controlsRef: React.RefObject<OrbitControlsImpl | null>) {
+  const invalidate = useThree((state) => state.invalidate)
+
   const handleCameraTopView = useCallback(() => {
     if (controlsRef.current) {
       const controls = controlsRef.current;
@@ -36,7 +38,8 @@ export function useCameraControls(controlsRef: React.RefObject<OrbitControlsImpl
         
         // Update controls
         controls.update();
-        
+        invalidate();
+
         // Continue animation if not complete
         if (progress < 1) {
           requestAnimationFrame(animate);
@@ -46,7 +49,7 @@ export function useCameraControls(controlsRef: React.RefObject<OrbitControlsImpl
       // Start animation
       animate();
     }
-  }, [controlsRef]);
+  }, [controlsRef, invalidate]);
 
   return { handleCameraTopView };
 } 

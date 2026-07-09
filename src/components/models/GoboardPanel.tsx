@@ -43,11 +43,7 @@ export default function GoboardPanel({ player }: { player: GoboardPlayer }) {
     }
   }, [goboard]);
 
-  useEffect(() => {
-    console.log('new player', player)
-  }, [player])
-
   return (
-    <Board player={goboard} />
+    <Board goboard={goboard} player={player} />
   )
 }

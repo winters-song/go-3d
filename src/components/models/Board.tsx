@@ -3,12 +3,18 @@ import * as THREE from 'three'
 import { ThreeEvent, useThree } from '@react-three/fiber'
 import Stone from './Stone'
 import Head from './Head'
-import { ContactShadows } from '@react-three/drei'
+import Goboard_3d from '../go/Goboard_3d'
+import GoboardPlayer from '../go/GoboardPlayer'
 
-export default function Board({ player }: { player: any }) {
+interface BoardProps {
+  goboard: Goboard_3d
+  player?: GoboardPlayer
+}
+
+export default function Board({ goboard, player }: BoardProps) {
   const [hoverCell, setHoverCell] = useState<{ col: number, row: number } | null>(null)
   const [lastPlacedStone, setLastPlacedStone] = useState<{ col: number, row: number } | null>(null)
-  const [showShadow, setShowShadow] = useState(false)
+  const [, setBoardVersion] = useState(0)
   const planeRef = useRef<THREE.Mesh>(null!)
   const { gl, controls } = useThree()
   const boardSize = 19
@@ -17,26 +23,21 @@ export default function Board({ player }: { player: any }) {
   const offset = gridScale / 2
   const unitLength = gridScale / (boardSize - 1)
 
-  // Convert board coordinates (col, row) to world position
   const boardToWorldPosition = (col: number, row: number): [number, number, number] => {
     return [
       col * unitLength - offset,
-      1.625, // Height above board
+      1.625,
       row * unitLength - offset
     ]
   }
 
-
   const getValidBoardPosition = (intersectionPoint: THREE.Vector3) => {
-    // Convert to board coordinates (0-18)
     const x = Math.floor((intersectionPoint.x + offset + unitLength / 2) / unitLength)
     const y = boardSize - 1 - Math.floor((intersectionPoint.y + offset + unitLength / 2) / unitLength)
 
-    // Validate position is within board
     if (x < 0 || x >= boardSize || y < 0 || y >= boardSize) return null
 
-    // Check if position is already occupied
-    const isOccupied = player.pieces[y * boardSize + x] !== 0
+    const isOccupied = goboard.pieces[y * boardSize + x] !== 0
     if (isOccupied) return null
 
     return {
@@ -47,21 +48,28 @@ export default function Board({ player }: { player: any }) {
 
   const handlePointerMove = (event: ThreeEvent<PointerEvent>) => {
     event.stopPropagation()
-    if (!planeRef.current || !player) return
+    if (!planeRef.current) return
 
-    if(player.options.readonly || player.clientColor !== player.currentColor) {
-      setHoverCell(null)
+    if (goboard.options.readonly || goboard.clientColor !== goboard.currentColor) {
+      if (hoverCell !== null) setHoverCell(null)
       gl.domElement.style.cursor = 'default'
       return
     }
 
-    // Get intersection point in local coordinates
     const intersectionPoint = event.point.clone()
     planeRef.current.worldToLocal(intersectionPoint)
 
     const position = getValidBoardPosition(intersectionPoint)
+    const nextCell = position ? { col: position.boardX, row: position.boardY } : null
+    const cellChanged =
+      (nextCell === null) !== (hoverCell === null) ||
+      (nextCell !== null && hoverCell !== null &&
+        (nextCell.col !== hoverCell.col || nextCell.row !== hoverCell.row))
+
+    if (!cellChanged) return
+
     if (position) {
-      setHoverCell({ col: position.boardX, row: position.boardY })
+      setHoverCell(nextCell)
       gl.domElement.style.cursor = 'pointer'
     } else {
       setHoverCell(null)
@@ -76,59 +84,40 @@ export default function Board({ player }: { player: any }) {
 
   const handleClick = (event: ThreeEvent<MouseEvent>) => {
     event.stopPropagation()
-    if (!planeRef.current || !player) return
+    if (!planeRef.current) return
 
-    if(player.options.readonly || player.clientColor !== player.currentColor) {
+    if (goboard.options.readonly || goboard.clientColor !== goboard.currentColor) {
       return
     }
 
-    // Get intersection point in local coordinates
     const intersectionPoint = event.point.clone()
     planeRef.current.worldToLocal(intersectionPoint)
 
     const position = getValidBoardPosition(intersectionPoint)
     if (!position) return
 
-    const { boardX, boardY } = position
-    player.shoot(boardX, boardY)
-
-    // player.add(1, boardX, boardY, false)
-    
-    // 此时页面不会重新渲染，需要改变state
-    // Store the last placed stone position
-    // setLastPlacedStone({ col: boardX, row: boardY })
-
-    // Switch player
-    // setCurrentPlayer(currentPlayer === 'black' ? 'white' : 'black')
-    // setHoverCell(null)
+    goboard.shoot(position.boardX, position.boardY)
   }
 
-  // Prevent OrbitControls from capturing events when interacting with the board
   const handlePointerDown = (event: ThreeEvent<PointerEvent>) => {
     event.stopPropagation()
-    
-    // Only change cursor if we're hovering over a valid position
+
     if (hoverCell) {
       gl.domElement.style.cursor = 'pointer'
     }
 
-    // Temporarily disable orbit controls
     if (controls) {
       // @ts-expect-error - disable orbit controls temporarily
       controls.enabled = false
     }
 
-    // Handle the click
     handleClick(event as unknown as ThreeEvent<MouseEvent>)
   }
 
   const handlePointerUp = (event: ThreeEvent<PointerEvent>) => {
     event.stopPropagation()
-    
-    // Reset cursor based on hover state
     gl.domElement.style.cursor = hoverCell ? 'pointer' : 'default'
 
-    // Re-enable orbit controls
     if (controls) {
       // @ts-expect-error - re-enable orbit controls
       controls.enabled = true
@@ -136,31 +125,22 @@ export default function Board({ player }: { player: any }) {
   }
 
   useEffect(() => {
-    if(player){
-      player.onSetHead((params: { col: number, row: number } | null) => {
-        setLastPlacedStone(params)
-      })
+    goboard.onSetHead((params: { col: number, row: number } | null) => {
+      setLastPlacedStone(params)
+    })
+  }, [goboard])
+
+  useEffect(() => {
+    if (!player) return
+    const onMove = () => setBoardVersion((v) => v + 1)
+    player.on('move', onMove)
+    return () => {
+      player.removeListener('move', onMove)
     }
   }, [player])
 
-  useEffect(() => {
-    setTimeout(() => {
-      setShowShadow(true)
-      console.log('showShadow', showShadow)
-    }, 3000)
-  }, [])
-
   return (
     <>
-      {/* Grid texture plane */}
-      {/* <mesh rotation-x={-Math.PI * 0.5} position-y={1.604} >
-        <planeGeometry args={[gridScale, gridScale]} />
-        <meshBasicMaterial transparent opacity={1} map={gridTexture} color={'white'} />
-        <meshLambertMaterial transparent opacity={1} map={gridTexture} emissive={'cyan'} emissiveIntensity={1.4} toneMapped={false} /> 
-      </mesh> */}
-
-
-      {/* Invisible plane for click detection */}
       <mesh
         ref={planeRef}
         rotation-x={-Math.PI * 0.5}
@@ -175,12 +155,11 @@ export default function Board({ player }: { player: any }) {
         <meshStandardMaterial visible={false} />
       </mesh>
 
-      {/* Preview stone */}
       {hoverCell && (
         <mesh position={boardToWorldPosition(hoverCell.col, hoverCell.row)} scale-y={0.4}>
           <sphereGeometry args={[0.07, 32, 32]} />
           <meshStandardMaterial
-            color={player.currentColor === 1 ? '#000000' : '#ffffff'}
+            color={goboard.currentColor === 1 ? '#000000' : '#ffffff'}
             transparent
             opacity={0.5}
             roughness={0.4}
@@ -189,13 +168,12 @@ export default function Board({ player }: { player: any }) {
         </mesh>
       )}
 
-      {/* Render stones */}
-      {player?.pieces.map((stoneValue: number, index: number) => {
-        if (stoneValue === 0) return null;
-        const row = Math.floor(index / boardSize);
-        const col = index % boardSize;
-        const position = boardToWorldPosition(col, row);
-        const color = stoneValue === 1 ? 'black' : 'white';
+      {goboard.pieces.map((stoneValue: number, index: number) => {
+        if (stoneValue === 0) return null
+        const row = Math.floor(index / boardSize)
+        const col = index % boardSize
+        const position = boardToWorldPosition(col, row)
+        const color = stoneValue === 1 ? 'black' : 'white'
 
         return (
           <Stone
@@ -203,17 +181,15 @@ export default function Board({ player }: { player: any }) {
             position={position}
             color={color}
           />
-        );
+        )
       })}
 
-      {/* Render head marker on last stone */}
       {lastPlacedStone && (
         <Head
           position={boardToWorldPosition(lastPlacedStone.col, lastPlacedStone.row)}
-          stoneColor={player.pieces[lastPlacedStone.row * boardSize + lastPlacedStone.col] === 1 ? 'black' : 'white'}
+          stoneColor={goboard.pieces[lastPlacedStone.row * boardSize + lastPlacedStone.col] === 1 ? 'black' : 'white'}
         />
       )}
-
     </>
   )
 }
