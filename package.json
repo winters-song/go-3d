@@ -12,7 +12,17 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "convert-models": "node src/tools/model-converter.js",
-    "convert-models-full": "node src/tools/full-model-converter.js"
+    "convert-models-full": "node src/tools/full-model-converter.js",
+    "prepare": "husky"
+  },
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "*.{json,css,md,mjs}": [
+      "prettier --write"
+    ]
   },
   "dependencies": {
     "@react-three/drei": "^10.0.7",
@@ -36,6 +46,8 @@
     "eslint": "^9",
     "eslint-config-next": "15.5.18",
     "eslint-config-prettier": "^10.1.8",
+    "husky": "9",
+    "lint-staged": "15",
     "prettier": "^3.9.4",
     "tailwindcss": "^4",
     "ts-node": "^10.9.2",
