@@ -1,6 +1,5 @@
 import Goboard from './Goboard_3d';
-import { Go, Color } from './Go';
-import { SgfMoveNode, SgfNode, SgfTree } from './SgfTree';
+import { Go, Color, SgfMoveNode, SgfNode, SgfTree } from 'goboard-sdk/core';
 import EventEmitter from 'events';
 import Audio from '../Audio/Audio';
 
@@ -205,14 +204,15 @@ export default class GoboardPlayer extends EventEmitter {
         let rand = Math.round(1e4 * Math.random()) % 5;
         Audio.playEffect(`stone${rand + 1}`);
       }
-      let me = this;
 
       if (eaten.size) {
-        const capures: any = [];
+        const capures: { col: number; row: number }[] = [];
         eaten.forEach(function (vertex: string) {
           const arr = vertex.split(',');
-          const index = parseInt(arr[1]) * me.boardSize + parseInt(arr[0]);
-          capures.push(index);
+          capures.push({
+            col: parseInt(arr[0], 10),
+            row: parseInt(arr[1], 10),
+          });
         });
 
         this.cb.eat(capures);
@@ -368,9 +368,8 @@ export default class GoboardPlayer extends EventEmitter {
     const moveResult = this.go.undo(1);
     this.cb.trace.pop();
 
-    // const key = node.col + "," + node.row;
-    const index = node.row * this.boardSize + node.col;
-    this.cb.removePiece(index);
+    const key = node.col + ',' + node.row;
+    this.cb.removePiece(key);
 
     if (moveResult && moveResult.eated && moveResult.eated.size) {
       moveResult.eated.forEach((move: any) => {
@@ -438,10 +437,10 @@ export default class GoboardPlayer extends EventEmitter {
 
     stones.forEach((i: any) => {
       // 暂不判断 pass
-      let index = i.row * this.boardSize + i.col;
+      const key = i.col + ',' + i.row;
 
       if (!i.mark && !i.move) {
-        this.cb?.addPiece(index, i.color, -1);
+        this.cb?.addPiece(key, i.col, i.row, i.color, -1);
         this.go.add(i.col, i.row, i.color);
       }
     });
@@ -654,7 +653,7 @@ export default class GoboardPlayer extends EventEmitter {
     let boardSize = 19;
     let sizeProp = sgfTree.root.getProperty('SZ');
     if (sizeProp && sizeProp.length) {
-      boardSize = sizeProp[0] * 1;
+      boardSize = Number(sizeProp[0]);
     }
 
     console.log('changeData', this.cb);

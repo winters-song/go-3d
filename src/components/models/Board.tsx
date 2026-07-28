@@ -34,7 +34,7 @@ export default function Board({ goboard, player }: BoardProps) {
 
     if (x < 0 || x >= boardSize || y < 0 || y >= boardSize) return null;
 
-    const isOccupied = goboard.pieces[y * boardSize + x] !== 0;
+    const isOccupied = !!goboard.pieces[`${x},${y}`];
     if (isOccupied) return null;
 
     return {
@@ -166,21 +166,20 @@ export default function Board({ goboard, player }: BoardProps) {
         </mesh>
       )}
 
-      {goboard.pieces.map((stoneValue: number, index: number) => {
-        if (stoneValue === 0) return null;
-        const row = Math.floor(index / boardSize);
-        const col = index % boardSize;
+      {Object.entries(goboard.pieces).map(([key, stoneValue]) => {
+        if (!stoneValue) return null;
+        const [col, row] = key.split(',').map(Number);
         const position = boardToWorldPosition(col, row);
         const color = stoneValue === 1 ? 'black' : 'white';
 
-        return <Stone key={index} position={position} color={color} />;
+        return <Stone key={key} position={position} color={color} />;
       })}
 
       {lastPlacedStone && (
         <Head
           position={boardToWorldPosition(lastPlacedStone.col, lastPlacedStone.row)}
           stoneColor={
-            goboard.pieces[lastPlacedStone.row * boardSize + lastPlacedStone.col] === 1
+            goboard.pieces[`${lastPlacedStone.col},${lastPlacedStone.row}`] === 1
               ? 'black'
               : 'white'
           }

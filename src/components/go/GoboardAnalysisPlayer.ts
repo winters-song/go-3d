@@ -1,5 +1,5 @@
 import GoboardPlayer from './GoboardPlayer';
-import { SgfMoveNode, SgfNode } from './SgfTree';
+import { SgfMoveNode, SgfNode } from 'goboard-sdk/core';
 
 /*
  *
@@ -236,8 +236,8 @@ export default class GoboardAnalysisPlayer extends GoboardPlayer {
     if (!(node.col === 19 && node.row === 19)) {
       const moveResult = this.go.undo(1);
       this.cb.trace.pop();
-      const index = node.row * this.boardSize + node.col;
-      this.cb.removePiece(index);
+      const key = node.col + ',' + node.row;
+      this.cb.removePiece(key);
 
       if (moveResult && moveResult.eated && moveResult.eated.size > 0) {
         moveResult.eated.forEach((move: any) => {

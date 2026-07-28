@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { Go, Color } from './Go';
+import { Go, Color } from 'goboard-sdk/core';
 
 describe('Go', () => {
   it('allows placing a stone on an empty intersection', () => {
@@ -44,13 +44,18 @@ describe('Go', () => {
 
   it('allows non-ko recapture when the captured group has multiple liberties', () => {
     const go = new Go(9);
+    // Two-stone black group
     go.play(2, 2, Color.BLACK);
+    go.play(3, 2, Color.BLACK);
+    // Surround and capture both
     go.play(1, 2, Color.WHITE);
-    go.play(3, 2, Color.WHITE);
     go.play(2, 1, Color.WHITE);
-    go.play(2, 3, Color.WHITE); // white captures black at (2,2)
+    go.play(2, 3, Color.WHITE);
+    go.play(3, 1, Color.WHITE);
+    go.play(3, 3, Color.WHITE);
+    go.play(4, 2, Color.WHITE);
 
-    // Not a one-stone ko shape — black may immediately play on (2,2)
+    // Vacated point still has a liberty (not a single-stone ko) — black may replay
     expect(go.play(2, 2, Color.BLACK)).not.toBeNull();
   });
 
