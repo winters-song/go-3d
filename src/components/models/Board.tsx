@@ -4,7 +4,7 @@ import { ThreeEvent, useThree } from '@react-three/fiber';
 import Stone from './Stone';
 import Head from './Head';
 import Goboard_3d from '../go/Goboard_3d';
-import GoboardPlayer from '../go/GoboardPlayer';
+import type { GoboardPlayer } from 'goboard-sdk/core';
 
 interface BoardProps {
   goboard: Goboard_3d;

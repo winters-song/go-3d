@@ -4,7 +4,7 @@ import { Canvas } from '@react-three/fiber';
 import { useRef, Suspense, useEffect } from 'react';
 import { useGLTF, Preload, Stats, Environment } from '@react-three/drei';
 import Lights from '@/components/models/Lights';
-import GoboardPlayer from '@/components/go/GoboardPlayer';
+import { GoboardPlayer } from 'goboard-sdk/core';
 import BottomBar from '@/components/ui/BottomBar';
 import RightSidebar from '@/components/ui/RightSidebar';
 import GoboardPanel from '@/components/models/GoboardPanel';

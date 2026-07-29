@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import GoboardPlayer from '../go/GoboardPlayer';
+import type { GoboardPlayer } from 'goboard-sdk/core';
 import NavigationButton from './NavigationButton';
 
 const SVG_PATHS = {

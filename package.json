@@ -1,6 +1,6 @@
 {
   "name": "go-3d",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -30,7 +30,7 @@
     "@react-three/postprocessing": "^3.0.4",
     "@reduxjs/toolkit": "^2.8.2",
     "@types/three": "^0.176.0",
-    "goboard-sdk": "file:../../remake/goboard-sdk",
+    "goboard-sdk": "0.2.1",
     "leva": "^0.10.1",
     "next": "15.5.18",
     "react": "^19.0.0",

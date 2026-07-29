@@ -40,6 +40,8 @@ export default class Goboard_3d {
     type: '',
     boardSize: 19,
     readonly: false,
+    showOrder: false as boolean | 'last',
+    showCoordinates: false,
     showHelperLines: false,
     playConfirm: false,
     sound: true,
@@ -50,6 +52,7 @@ export default class Goboard_3d {
   onMarkCb = (_currentMarker: string, _col: number, _row: number) => {};
   onPlayCb = (_color: number, _col: number, _row: number) => {};
   onSetHeadCb = (_params: { col: number; row: number } | null) => {};
+  onUpdateHelperLineCb = (_col: number, _row: number) => {};
 
   constructor(cfg: Partial<typeof Goboard_3d.prototype.options> = {}) {
     Object.assign(this.options, cfg);
@@ -190,6 +193,11 @@ export default class Goboard_3d {
     return this;
   }
 
+  onUpdateHelperLine(cb: (col: number, row: number) => void) {
+    this.onUpdateHelperLineCb = cb;
+    return this;
+  }
+
   onSetHead(cb: (params: { col: number; row: number } | null) => void) {
     this.onSetHeadCb = cb;
     return this;
@@ -208,6 +216,8 @@ export default class Goboard_3d {
   clearMarkers() {}
 
   drawMarker(_mark: string, _col: number, _row: number) {}
+
+  changeTheme(_settings: unknown) {}
 
   destroy() {
     this.clearBoard();

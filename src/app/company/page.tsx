@@ -6,7 +6,7 @@ import { useGLTF, Preload, Stats, Environment, ContactShadows } from '@react-thr
 import { useControls } from 'leva';
 import Loader from '@/components/models/Loader';
 import Lights from '@/components/models/Lights';
-import GoboardPlayer from '@/components/go/GoboardPlayer';
+import { GoboardPlayer } from 'goboard-sdk/core';
 import BottomBar from '@/components/ui/BottomBar';
 import RightSidebar from '@/components/ui/RightSidebar';
 import GoboardPanel from '@/components/models/GoboardPanel';

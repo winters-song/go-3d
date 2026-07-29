@@ -2869,8 +2869,10 @@ glsl-noise@^0.0.0:
   resolved "https://registry.npmmirror.com/glsl-noise/-/glsl-noise-0.0.0.tgz"
   integrity sha512-b/ZCF6amfAUb7dJM/MxRs7AetQEahYzJ8PtgfrmEdtw6uyGOr+ZSGtgjFm6mfsBkxJ4d2W7kg+Nlqzqvn3Bc0w==
 
-"goboard-sdk@file:../../remake/goboard-sdk":
-  version "0.1.1"
+goboard-sdk@0.2.1:
+  version "0.2.1"
+  resolved "https://registry.npmjs.org/goboard-sdk/-/goboard-sdk-0.2.1.tgz#545a28d4da7e732664043319637fcad41a3087a4"
+  integrity sha512-JooHbuO0DrRkibf5Z2hJNI3EbE+czzpiSZznX/dU3xHqkziuXMKKRSEdhVNlCB2CI5/OPJcXK7xlN9lErKBUKQ==
   dependencies:
     events "^3.3.0"
     raphael "^2.3.0"

@@ -13,7 +13,7 @@ import PageInfoModal from './PageInfoModal';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { setCameraLock } from '@/store/cameraSlice';
 import { useCameraTopView } from '@/components/CursorManager';
-import GoboardPlayer from '../go/GoboardPlayer';
+import type { GoboardPlayer } from 'goboard-sdk/core';
 import Tooltip from './Tooltip';
 
 interface RightSidebarProps {
